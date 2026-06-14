@@ -58,8 +58,8 @@
     const bar = $(".pre-bar i", pre);
     const count = $(".pre-count", pre);
     if (reduce) { finish(); return; }
-    // snappy time-based fill (start .12s + fill .8s + .15s hold), then a quick fly-off exit
-    const t0 = performance.now(), DUR = 800;
+    // time-based fill (start .18s + fill 1.9s + .3s hold ~= 2.4s on screen) then a .8s fly-off exit
+    const t0 = performance.now(), DUR = 1900;
     const tick = () => {
       const raw = Math.min(1, (performance.now() - t0) / DUR);
       const e = 1 - Math.pow(1 - raw, 2);
@@ -67,9 +67,9 @@
       if (bar) bar.style.width = p + "%";
       if (count) count.textContent = String(p).padStart(3, "0");
       if (raw < 1) requestAnimationFrame(tick);
-      else setTimeout(finish, 150);
+      else setTimeout(finish, 300);
     };
-    setTimeout(() => requestAnimationFrame(tick), 120);
+    setTimeout(() => requestAnimationFrame(tick), 180);
     function finish() {
       // pick a random fly-off direction each load (up / down / left / right / two diagonals)
       const DIRS = [["0%", "-100%"], ["0%", "100%"], ["-100%", "0%"], ["100%", "0%"], ["-100%", "-100%"], ["100%", "-100%"]];
@@ -81,8 +81,8 @@
       setTimeout(() => {
         document.body.classList.add("loaded");
         document.dispatchEvent(new Event("app:loaded"));
-      }, 560);
-      setTimeout(() => pre.remove(), 760);
+      }, 640);
+      setTimeout(() => pre.remove(), 880);
     }
   }
 
@@ -253,7 +253,12 @@
     if (reduce) { cards.forEach((c) => { c.style.opacity = "1"; c.style.transform = ""; c.classList.add("is-set"); }); return; }
     const small = window.innerWidth < 760;
     const active = new Set();
-    cards.forEach((c, i) => { c._col = (i % 2 === 0) ? -1 : 1; c.style.opacity = "0"; });
+    cards.forEach((c, i) => { c._col = (i % 2 === 0) ? -1 : 1; c._i = i; c.style.opacity = "0"; });
+    // cache each card's document-Y (offsetTop chain ignores our own transform) so the scroll
+    // handler never reads getBoundingClientRect per card = no layout thrash
+    const pageY = (el) => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
+    let tops = cards.map(pageY);
+    const measure = () => { tops = cards.map(pageY); };
     const io = new IntersectionObserver((ens) => {
       ens.forEach((en) => { if (en.isIntersecting) active.add(en.target); else active.delete(en.target); });
       schedule();
@@ -263,10 +268,10 @@
     let ticking = false;
     function update() {
       ticking = false;
-      const vh = window.innerHeight, start = vh * 0.94, end = vh * 0.42;
+      const vh = window.innerHeight, start = vh * 0.94, end = vh * 0.42, sy = window.scrollY;
       active.forEach((c) => {
-        const r = c.getBoundingClientRect();
-        let p = (start - r.top) / (start - end);
+        const top = tops[c._i] - sy;                    // viewport-top without a per-card reflow
+        let p = (start - top) / (start - end);
         p = p < 0 ? 0 : p > 1 ? 1 : p;
         if (p >= 1) {
           if (!c._set) { c._set = true; c.classList.add("is-set"); c.style.transform = ""; c.style.opacity = ""; }
@@ -274,18 +279,22 @@
         }
         c._set = false; c.classList.remove("is-set");
         const e = ease(p);
-        const ty = (1 - e) * (small ? 36 : 70);
-        const tz = (1 - e) * (small ? -130 : -260);
-        const rx = (1 - e) * (small ? 11 : 22);
-        const ry = c._col * (1 - e) * (small ? 6 : 12);
+        const ty = (1 - e) * (small ? 34 : 70);
         const sc = 0.9 + e * 0.1;
         c.style.opacity = (0.1 + e * 0.9).toFixed(3);
-        c.style.transform = `translate3d(0, ${ty.toFixed(1)}px, ${tz.toFixed(0)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+        if (small) {
+          // phones: a clean 2D rise (no 3D depth/rotation = far cheaper to composite, no jank)
+          c.style.transform = `translate3d(0, ${ty.toFixed(1)}px, 0) scale(${sc.toFixed(3)})`;
+        } else {
+          const tz = (1 - e) * -260, rx = (1 - e) * 22, ry = c._col * (1 - e) * 12;
+          c.style.transform = `translate3d(0, ${ty.toFixed(1)}px, ${tz.toFixed(0)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+        }
       });
     }
     function schedule() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("resize", () => { measure(); schedule(); }, { passive: true });
+    window.addEventListener("load", () => { measure(); schedule(); });
     schedule();
   }
 
