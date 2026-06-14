@@ -1498,12 +1498,29 @@
     ldInject("ld-base", { "@context": "https://schema.org", "@graph": graph });
   }
 
+  /* ----------  SECTION-LEVEL LAZY MEDIA  ----------
+     Marquee images (brand wall + "what I deliver") can't use loading="lazy":
+     their off-screen row positions never intersect the viewport so they stay blank.
+     Instead they ship as data-src (invisible to the preload scanner = fast first paint)
+     and we swap in the real src when the section nears the viewport. */
+  function lazyMedia() {
+    const load = (root) => $$("img[data-src]", root).forEach((im) => { im.src = im.dataset.src; im.removeAttribute("data-src"); });
+    const groups = $$(".deliver-sec, .logos");
+    if (!groups.length) return;
+    if (!("IntersectionObserver" in window)) { groups.forEach(load); return; }
+    const io = new IntersectionObserver((ens) => {
+      ens.forEach((en) => { if (en.isIntersecting) { load(en.target); io.unobserve(en.target); } });
+    }, { rootMargin: "600px 0px" });
+    groups.forEach((g) => io.observe(g));
+  }
+
   function init() {
     splitWords();
     preloader();
     cursor();
     reveal();
     marquee();
+    lazyMedia();
     curvedLogos();
     magnetic();
     counters();
