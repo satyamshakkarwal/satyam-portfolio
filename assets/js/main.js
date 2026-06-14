@@ -431,8 +431,8 @@
   function spine() {
     const wrap = $(".page-spine");
     if (!wrap || reduce || window.innerWidth < 900) return;
-    let fill = null, glow = null, len = 0, lastH = 0, ticking = false;
-    let samples = [], qStep = 1, lastQ = -1;
+    let fill = null, glow = null, len = 0, lastH = 0;
+    let samples = [], curOff = 0, targetOff = 0, animRaf = null, isOn = false;
     const SN = 420;
     const yMid = (el) => { if (!el) return 0; const r = el.getBoundingClientRect(); return r.top + scrollY + r.height / 2; };
     const yTop = (el) => { if (!el) return 0; return el.getBoundingClientRect().top + scrollY; };
@@ -493,19 +493,17 @@
         '<path class="sp-fill" d="' + d + '" stroke="url(#spineg)"/></svg>';
       fill = $(".sp-fill", wrap); glow = $(".sp-glow", wrap);
       len = fill.getTotalLength();
-      fill.style.strokeDasharray = len; fill.style.strokeDashoffset = len;
-      glow.style.strokeDasharray = len; glow.style.strokeDashoffset = len;
+      fill.style.strokeDasharray = len;
+      glow.style.strokeDasharray = len;
       // sample the path once so scrolling never calls path geometry
       samples = [];
       for (let i = 0; i <= SN; i++) samples.push(fill.getPointAtLength((len * i) / SN));
-      qStep = len / 220;
-      lastQ = -1;
+      // snap the drawn length to the current scroll position (rebuild should not re-animate the draw)
+      computeTarget(); curOff = targetOff; apply();
     }
 
-    function frame() {
-      ticking = false;
-      if (!fill || !samples.length) return;
-      wrap.classList.toggle("is-on", scrollY > 30);
+    function computeTarget() {
+      isOn = scrollY > 30;
       // anchor the tip to what the viewer is looking at (so it never drifts away on long sections):
       // binary-search the path samples by page-Y for the point at ~70% of the viewport
       const anchor = Math.max(samples[0].y, Math.min(samples[SN].y, scrollY + window.innerHeight * 0.7));
@@ -515,24 +513,39 @@
       const a = samples[i0], b = samples[Math.min(SN, i0 + 1)];
       const fr = (b.y > a.y) ? Math.min(1, Math.max(0, (anchor - a.y) / (b.y - a.y))) : 0;
       const f = (i0 + fr) / SN;
-      // line draw: quantized so the SVG repaints only every few frames, not 60x/s
-      const q = Math.round((len * (1 - f)) / qStep) * qStep;
-      if (q !== lastQ) { const v = q.toFixed(1); fill.style.strokeDashoffset = v; glow.style.strokeDashoffset = v; lastQ = q; }
+      targetOff = len * (1 - f);
     }
-    addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
+    function apply() {
+      const v = curOff.toFixed(1);
+      fill.style.strokeDashoffset = v; glow.style.strokeDashoffset = v;
+      wrap.classList.toggle("is-on", isOn);
+    }
+    // butter-smooth: glide the drawn length toward the scroll target every frame (continuous, no coarse stepping)
+    function render() {
+      animRaf = null;
+      if (!fill || !samples.length) return;
+      computeTarget();
+      const d = targetOff - curOff;
+      if (Math.abs(d) < 0.5) { curOff = targetOff; apply(); return; }  // settled
+      curOff += d * 0.2;                                               // ease toward target
+      apply();
+      animRaf = requestAnimationFrame(render);
+    }
+    function kick() { if (animRaf == null) animRaf = requestAnimationFrame(render); }
+    addEventListener("scroll", kick, { passive: true });
     let rsz = null;
-    addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(() => { build(); frame(); }, 220); }, { passive: true });
+    addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(build, 220); }, { passive: true });
     // sections settle after fonts/images load; rebuild once everything is final
-    addEventListener("load", () => { build(); frame(); });
+    addEventListener("load", build);
     // rebuild only when the page height truly changes (no per-frame scrollHeight read = no forced reflow while scrolling)
     if ("ResizeObserver" in window) {
       let rb = null;
       new ResizeObserver(() => {
         if (document.body.scrollHeight === lastH) return;
-        clearTimeout(rb); rb = setTimeout(() => { build(); frame(); }, 60);
+        clearTimeout(rb); rb = setTimeout(build, 60);
       }).observe(document.body);
     }
-    build(); frame();
+    build();
   }
 
   /* ----------  ABOUT PAGE FX (parallax word, ignite text, journey draw, portrait tilt)  ---------- */
