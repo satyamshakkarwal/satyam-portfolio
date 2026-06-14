@@ -108,7 +108,7 @@ h1, h2, h3, h4, .display {
 .preloader {
   position: fixed; inset: 0; z-index: 9999; background: var(--bg);
   display: grid; place-items: center; overflow: hidden;
-  transition: transform 1.05s cubic-bezier(.72,0,.18,1); will-change: transform;
+  transition: transform .72s cubic-bezier(.72,0,.18,1); will-change: transform;
 }
 /* dramatic exit: the loader flies off in a random direction (set by JS) while the content scales out + fades */
 .preloader.done { transform: translate(var(--ex, 0%), var(--ey, -100%)); }
@@ -436,6 +436,17 @@ h1, h2, h3, h4, .display {
 @media (max-width: 700px) {
   .ticker { -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent); mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent); }
   .ticker-track { animation-duration: 38s; }
+  /* lighter ambient blobs on phones: blur(90px) over 46vw is heavy to raster on mobile GPUs */
+  .bg-field .blob { filter: blur(62px); opacity: .78; }
+}
+/* TOUCH DEVICES: backdrop-filter on a sticky bar re-blurs the page every scroll frame = jank on
+   mobile GPUs. --surface-2 is already ~90% opaque, so a solid translucent bg looks the same. */
+@media (hover: none) {
+  .nav-inner {
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0) 58%), color-mix(in srgb, var(--bg) 93%, transparent);
+  }
+  .mobile-menu { backdrop-filter: none; -webkit-backdrop-filter: none; background: color-mix(in srgb, var(--bg) 97%, transparent); }
 }
 
 /* ----------  LOGO MARQUEE (brand wall)  ---------- */

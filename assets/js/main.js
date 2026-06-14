@@ -58,8 +58,8 @@
     const bar = $(".pre-bar i", pre);
     const count = $(".pre-count", pre);
     if (reduce) { finish(); return; }
-    // smooth time-based fill (start .32s + fill 1.9s + .3s hold), then a ~1.05s fly-off exit
-    const t0 = performance.now(), DUR = 1900;
+    // snappy time-based fill (start .12s + fill .8s + .15s hold), then a quick fly-off exit
+    const t0 = performance.now(), DUR = 800;
     const tick = () => {
       const raw = Math.min(1, (performance.now() - t0) / DUR);
       const e = 1 - Math.pow(1 - raw, 2);
@@ -67,9 +67,9 @@
       if (bar) bar.style.width = p + "%";
       if (count) count.textContent = String(p).padStart(3, "0");
       if (raw < 1) requestAnimationFrame(tick);
-      else setTimeout(finish, 300);
+      else setTimeout(finish, 150);
     };
-    setTimeout(() => requestAnimationFrame(tick), 320);
+    setTimeout(() => requestAnimationFrame(tick), 120);
     function finish() {
       // pick a random fly-off direction each load (up / down / left / right / two diagonals)
       const DIRS = [["0%", "-100%"], ["0%", "100%"], ["-100%", "0%"], ["100%", "0%"], ["-100%", "-100%"], ["100%", "-100%"]];
@@ -81,8 +81,8 @@
       setTimeout(() => {
         document.body.classList.add("loaded");
         document.dispatchEvent(new Event("app:loaded"));
-      }, 950);
-      setTimeout(() => pre.remove(), 1280);
+      }, 560);
+      setTimeout(() => pre.remove(), 760);
     }
   }
 
