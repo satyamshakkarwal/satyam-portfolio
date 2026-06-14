@@ -59,7 +59,7 @@
     const count = $(".pre-count", pre);
     if (reduce) { finish(); return; }
     // time-based fill (start .18s + fill 1.9s + .3s hold ~= 2.4s on screen) then a .8s fly-off exit
-    const t0 = performance.now(), DUR = 1900;
+    const t0 = performance.now(), DUR = 2000;
     const tick = () => {
       const raw = Math.min(1, (performance.now() - t0) / DUR);
       const e = 1 - Math.pow(1 - raw, 2);
@@ -67,7 +67,7 @@
       if (bar) bar.style.width = p + "%";
       if (count) count.textContent = String(p).padStart(3, "0");
       if (raw < 1) requestAnimationFrame(tick);
-      else setTimeout(finish, 300);
+      else setTimeout(finish, 420);
     };
     setTimeout(() => requestAnimationFrame(tick), 180);
     function finish() {
@@ -1180,6 +1180,14 @@
       const desc = (ov ? ov.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().slice(0, 155)
         : `${p.name}, a ${p.platform} ${p.industry || "web"} project designed and built by Satyam Shakkarwal.`);
       const md = document.querySelector('meta[name="description"]'); if (md) md.setAttribute("content", desc);
+      // per-project social tags so sharing a case study shows the right title / image
+      const setM = (sel, val) => { const m = document.querySelector(sel); if (m) m.setAttribute("content", val); };
+      const shareImg = o ? o + "/assets/img/projects/" + slug + "-cf.jpg" : "assets/img/projects/" + slug + "-cf.jpg";
+      setM('meta[property="og:title"]', p.name + " · " + p.platform + " project by Satyam Shakkarwal");
+      setM('meta[property="og:description"]', desc);
+      setM('meta[property="og:url"]', o + "/project.html?p=" + slug);
+      setM('meta[property="og:image"]', shareImg);
+      setM('meta[name="twitter:image"]', shareImg);
       ldInject("ld-project", { "@context": "https://schema.org", "@graph": [
         { "@type": "CreativeWork", "@id": o + "/project.html?p=" + slug + "#work",
           "name": p.name + " · " + p.platform + " website", "headline": p.name,

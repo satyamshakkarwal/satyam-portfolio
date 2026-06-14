@@ -447,6 +447,14 @@ h1, h2, h3, h4, .display {
     background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0) 58%), color-mix(in srgb, var(--bg) 93%, transparent);
   }
   .mobile-menu { backdrop-filter: none; -webkit-backdrop-filter: none; background: color-mix(in srgb, var(--bg) 97%, transparent); }
+  /* bigger tap targets on touch (WCAG 2.5.5) — extend hit areas without changing the visuals */
+  .cf-dot { position: relative; }
+  .cf-dot::after { content: ""; position: absolute; inset: -11px; }
+  .footer-col a { padding: .5rem 0; }
+  .mm-social a { display: inline-block; padding: .4rem 0; }
+  .brand { padding: .4rem 0; }
+  .crumb a { display: inline-block; padding: .4rem 0; }
+  .footer-big a, .mm-social a, .mm-cta { min-height: 30px; }
 }
 
 /* ----------  LOGO MARQUEE (brand wall)  ---------- */
