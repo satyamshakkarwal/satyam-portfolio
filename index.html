@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="theme-color" content="#E2541F" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Satyam Shakkarwal · Shopify & Framer Web Developer" />
+<meta property="og:description" content="Premium Shopify stores and Framer websites built for performance, SEO, and conversion. 15+ sites shipped, 4.9★." />
+<meta property="og:image" content="og-image.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="og-image.jpg" />
+<title>Satyam Shakkarwal · Shopify & Framer Web Developer</title>
+<meta name="description" content="Satyam Shakkarwal builds premium Shopify stores and Framer websites focused on clean design, performance, and conversion. 15+ sites shipped, 4.9/5 rating." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" /></noscript>
+<link rel="preload" as="image" href="assets/img/projects/trydent-hero.jpg" />
+<link rel="stylesheet" href="assets/css/style.css?v=36" />
+</head>
+<body class="no-scroll">
+
+<!-- PRELOADER (content built by main.js) -->
+<div class="preloader" data-word="SATYAM"></div>
+
+<!-- BACKDROP -->
+<div class="bg-field" aria-hidden="true">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+</div>
+<div class="bg-grain" aria-hidden="true"></div>
+<div class="scroll-prog"></div>
+<div class="page-spine" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Satyam<span style="color:var(--accent)">.</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="projects.html">Projects</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="nav-right">
+      <button class="theme-switch" data-theme-toggle aria-label="Toggle light and dark theme">
+        <span class="ts-star s1"></span><span class="ts-star s2"></span><span class="ts-star s3"></span>
+        <span class="ts-thumb"><span class="ts-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3.6"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.5 1.5M17.9 17.9l1.5 1.5M2.5 12h2.2M19.3 12h2.2M6.1 17.9l-1.5 1.5M19.4 4.6l-1.5 1.5"/></svg></span></span>
+      </button>
+      <a href="contact.html" class="nav-cta" data-magnetic="0.25">Let's talk
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:15px;height:15px"><path d="M7 17L17 7M9 7h8v8"/></svg>
+      </a>
+      <button class="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu">
+  <div class="mm-inner">
+    <span class="mm-eyebrow">Navigate</span>
+    <nav class="mm-links">
+      <a href="index.html"><span class="mm-i">01</span> Home <span class="mm-ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      <a href="projects.html"><span class="mm-i">02</span> Projects <span class="mm-ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      <a href="about.html"><span class="mm-i">03</span> About <span class="mm-ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      <a href="contact.html"><span class="mm-i">04</span> Contact <span class="mm-ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+    </nav>
+    <div class="mm-foot">
+      <a href="https://wa.me/919205781271" target="_blank" rel="noopener" class="mm-cta"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.9c0 1.76.46 3.45 1.32 4.95L2 22l5.3-1.39a9.9 9.9 0 0 0 4.73 1.2h.01c5.46 0 9.91-4.45 9.91-9.9C21.95 6.45 17.5 2 12.04 2zm4.56 11.97c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.25 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg> Chat on WhatsApp</a>
+      <div class="mm-social">
+        <a href="https://www.instagram.com/satyam.createss/" target="_blank" rel="noopener">Instagram</a>
+        <a href="mailto:sam.createsssss@gmail.com">Email</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-scene" aria-hidden="true">
+    <span class="liq liq1"></span><span class="liq liq2"></span><span class="liq liq3"></span><span class="liq liq4"></span>
+  </div>
+  <div class="hero-spot" aria-hidden="true"></div>
+  <div class="hero-sweep" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="avail" data-animate="fade-up"><span class="live"></span> Available for new projects</div>
+      <h1>
+        <span class="line"><span data-animate="fade-up">I build premium</span></span>
+        <span class="line"><span class="grad" data-animate="fade-up" data-delay="1">Shopify &amp; Framer</span></span>
+        <span class="line"><span data-animate="fade-up" data-delay="2">websites that <span class="rot"><b>convert.</b><b>sell.</b><b>scale.</b><b>rank.</b></span></span></span>
+      </h1>
+      <p class="hero-sub" data-animate="fade-up" data-delay="3">
+        Clean design, performance, and conversion-driven builds for eCommerce and service brands.
+        3.5+ years turning clean ideas into stores that sell.
+      </p>
+      <div class="hero-cta" data-animate="fade-up" data-delay="4">
+        <a href="projects.html" class="btn btn-primary btn-lg" data-magnetic="0.3">View my work
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </a>
+        <a href="contact.html" class="btn btn-ghost btn-lg" data-magnetic="0.3">Start a project</a>
+      </div>
+      <div class="hero-tags" data-animate="fade-up" data-delay="5">
+        <span class="chip">Shopify Expert</span>
+        <span class="chip">Framer Developer</span>
+        <span class="chip">Web Design</span>
+        <span class="chip">CRO &amp; Speed</span>
+        <span class="chip">UI / UX</span>
+      </div>
+    </div>
+    <div class="hero-show" aria-hidden="true">
+      <div class="hs-stage">
+        <figure class="hs-card hs-back"><span class="hs-bar"><i></i><i></i><i></i><span class="hs-url">fragfreak.in</span></span><div class="hs-screen"><img src="assets/img/projects/fragfreak-hero.jpg" alt="FragFreak fragrance store built on Shopify" loading="eager" decoding="async"></div></figure>
+        <figure class="hs-card hs-front"><span class="hs-bar"><i></i><i></i><i></i><span class="hs-url">trydent.in</span></span><div class="hs-screen"><img src="assets/img/projects/trydent-hero.jpg" alt="Trydent store" loading="eager" decoding="async"></div></figure>
+        <span class="hs-badge"><b>4.9&#9733;</b> &middot; 15+ sites shipped</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- TICKER -->
+<section class="logos">
+  <div class="logos-glow" aria-hidden="true"></div>
+  <div class="logos-aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="logos-iris" aria-hidden="true"></div>
+  <div class="wrap logos-head">
+    <span class="logos-eyebrow">Trusted by founders</span>
+    <h3 class="logos-title">Brands I've built for</h3>
+    <p class="logos-sub">From fragrance and fashion to fitness and healthcare, 15+ stores shipped.</p>
+  </div>
+  <div class="logos-marquee" aria-hidden="true">
+    <div class="ticker-track logos-track">
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/taneja-cloth-house.png" alt="Taneja Cloth House"></span>
+      <span class="logo-cell"><img class="lw inv" src="assets/img/logos/fragfreak.png" alt="FragFreak"></span>
+      <span class="logo-cell"><img class="lw inv" src="assets/img/logos/perfy-you.png" alt="Perfy You"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/creative-inktales.png" alt="Creative Inktales"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/the-funky-fitz.png" alt="The Funky Fitz"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/poweroxx.png" alt="PoweRoxx"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/chaheti.png" alt="Chaheti"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/light-as-air-sales.png" alt="Light As Air Sales"></span>
+    </div>
+    <div class="ticker-track logos-track rev">
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/blackout-lifting-club.png" alt="Blackout Lifting Club"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/helping-life-foundation.png" alt="Helping Life Foundation"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/trydent.png" alt="Trydent"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/glass-on-go.png" alt="Glass On Go"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/kurta-pyjama-ca.png" alt="Kurta Pyjama CA"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/sundar-prem.png" alt="Sundar Prem"></span>
+      <span class="logo-cell"><img class="lw" src="assets/img/logos/owners-pride-healthcare.png" alt="Owner's Pride Healthcare"></span>
+    </div>
+  </div>
+</section>
+
+<!-- CONVERGE CRAFT MOMENT -->
+<section class="cv-sec" id="craft" aria-label="The craft">
+  <div class="cv-pin">
+    <div class="cv-stage">
+      <div class="cv-card cv-l cv-design">
+        <span class="cvc-tag">Design</span>
+        <div class="cvc-pal"><i style="background:#E2541F"></i><i style="background:#F2A03D"></i><i style="background:#C0392B"></i><i style="background:#211A12"></i><i style="background:#FBF4EA"></i></div>
+        <div class="cvc-type">Aa</div>
+        <div class="cvc-meta">Space Grotesk &middot; clean hierarchy</div>
+      </div>
+      <div class="cv-card cv-r cv-build">
+        <span class="cvc-tag">Build</span>
+<pre class="cvc-code"><span class="c1">&lt;section</span> <span class="c2">class</span>=<span class="c3">"hero"</span><span class="c1">&gt;</span>
+  <span class="c1">{%</span> <span class="c2">render</span> <span class="c3">'product'</span> <span class="c1">%}</span>
+  <span class="c4">// fast. clean. converts.</span>
+<span class="c1">&lt;/section&gt;</span></pre>
+      </div>
+      <div class="cv-mid">
+        <span class="eyebrow">The craft</span>
+        <h2>Pixel-perfect<br><span class="grad">execution.</span></h2>
+        <p>Clean design, fast builds, and the small details that make a brand feel premium.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="section" style="padding-block: clamp(3rem,7vw,5rem)">
+  <div class="wrap">
+    <div class="statx-grid">
+      <div class="statx-card" data-animate="fade-up"><div class="statx-num"><span data-count="15" data-suffix="+">0</span></div><div class="statx-lbl">Websites Built</div></div>
+      <div class="statx-card" data-animate="fade-up" data-delay="1"><div class="statx-num"><span data-count="100" data-suffix="%">0</span></div><div class="statx-lbl">Happy Clients</div></div>
+      <div class="statx-card" data-animate="fade-up" data-delay="2"><div class="statx-num"><span data-count="3.5" data-suffix="+">0</span></div><div class="statx-lbl">Years of Experience</div></div>
+      <div class="statx-card" data-animate="fade-up" data-delay="3"><div class="statx-num statx-word">Modern</div><div class="statx-lbl">Modern Web Experiences</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PROJECTS -->
+<section class="section" id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" data-animate="fade-up">Selected work</span>
+        <h2 class="reveal-words" data-animate>Projects that perform</h2>
+      </div>
+      <p data-animate="fade-up" data-delay="1">A mix of Shopify stores and Framer sites built for fashion, healthcare, lifestyle and eCommerce brands.</p>
+    </div>
+
+    <div class="proj-grid">
+      <a href="project.html?p=taneja-cloth-house" class="proj-card card3d" data-card3d>
+        <div class="proj-visual"><div class="mesh mesh-a"></div><span class="yr">2026</span><span class="logo">Taneja<br>Cloth House</span></div>
+        <div class="proj-body">
+          <div class="top"><h3>Taneja Cloth House</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
+          <p>A women's ethnic wear store migrated from ShopDeck to Shopify and fully redesigned in just days.</p>
+          <div class="proj-meta"><span class="tag shopify">Shopify</span><span class="tag">Ethnic Wear</span><span class="tag">Migration</span></div>
+        </div>
+      </a>
+
+      <a href="project.html?p=fragfreak" class="proj-card card3d" data-card3d>
+        <div class="proj-visual"><div class="mesh mesh-a"></div><span class="yr">2026</span><span class="logo">FragFreak</span></div>
+        <div class="proj-body">
+          <div class="top"><h3>FragFreak</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
+          <p>A bold fragrance store with a fast, scent-led shopping experience and a clean, premium build.</p>
+          <div class="proj-meta"><span class="tag shopify">Shopify</span><span class="tag">eCommerce</span><span class="tag">Design</span></div>
+        </div>
+      </a>
+
+      <a href="project.html?p=perfy-you" class="proj-card card3d" data-card3d>
+        <div class="proj-visual"><div class="mesh mesh-b"></div><span class="yr">2026</span><span class="logo">Perfy You</span></div>
+        <div class="proj-body">
+          <div class="top"><h3>Perfy You</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
+          <p>A jewellery and accessories brand with clean product storytelling and a checkout tuned for conversion.</p>
+          <div class="proj-meta"><span class="tag shopify">Shopify</span><span class="tag">Jewellery</span><span class="tag">CRO</span></div>
+        </div>
+      </a>
+
+      <a href="project.html?p=creative-inktales" class="proj-card card3d" data-card3d>
+        <div class="proj-visual"><div class="mesh mesh-c"></div><span class="yr">2025</span><span class="logo">Creative<br>Inktales</span></div>
+        <div class="proj-body">
+          <div class="top"><h3>Creative Inktales</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
+          <p>A bold creative brand store on Shopify with clear storytelling and clean product pages.</p>
+          <div class="proj-meta"><span class="tag shopify">Shopify</span><span class="tag">Creative</span><span class="tag">Design</span></div>
+        </div>
+      </a>
+
+      <a href="project.html?p=helping-life-foundation" class="proj-card card3d" data-card3d>
+        <div class="proj-visual"><div class="mesh mesh-d"></div><span class="yr">2026</span><span class="logo">Helping Life<br>Foundation</span></div>
+        <div class="proj-body">
+          <div class="top"><h3>Helping Life Foundation</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
+          <p>A trustworthy non-profit site that makes the mission clear and donations effortless.</p>
+          <div class="proj-meta"><span class="tag framer">Framer</span><span class="tag">Non-profit</span><span class="tag">Trust</span></div>
+        </div>
+      </a>
+
+      <a href="project.html?p=trydent" class="proj-card card3d" data-card3d>
+        <div class="proj-visual"><div class="mesh mesh-f"></div><span class="yr">2022</span><span class="logo">Trydent</span></div>
+        <div class="proj-body">
+          <div class="top"><h3>Trydent</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
+          <p>A modern D2C store with a clean storefront and a setup ready to scale with paid ads.</p>
+          <div class="proj-meta"><span class="tag shopify">Shopify</span><span class="tag">D2C</span><span class="tag">Fashion</span></div>
+        </div>
+      </a>
+    </div>
+
+    <div style="text-align:center;margin-top:2.6rem" data-animate="fade-up">
+      <a href="projects.html" class="btn btn-ghost btn-lg" data-magnetic="0.3">See all projects
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:16px;height:16px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" data-animate="fade-up">What I do</span>
+        <h2 class="reveal-words" data-animate>Services I offer</h2>
+      </div>
+      <p data-animate="fade-up" data-delay="1">From first wireframe to launch, I handle the full build.</p>
+    </div>
+
+    <div class="serv-grid">
+      <div class="serv-card" data-animate="serv">
+        <div class="serv-num">01</div>
+        <div class="serv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9h18M9 21V9"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+        <h3>Shopify &amp; Framer Development</h3>
+        <p>Custom, fast-loading stores and sites built to match your brand and convert visitors into customers.</p>
+        <ul><li>Theme customization</li><li>Custom sections</li><li>Framer CMS</li><li>Integrations</li></ul>
+      </div>
+      <div class="serv-card" data-animate="serv">
+        <div class="serv-num">02</div>
+        <div class="serv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17l-6.3 4.4L8 14 2 9.4h7.6z"/></svg></div>
+        <h3>UI / UX Design</h3>
+        <p>Clean, modern interfaces with clear hierarchy and motion that guides people to the next step.</p>
+        <ul><li>Wireframes</li><li>Design systems</li><li>Prototyping</li><li>Visual design</li></ul>
+      </div>
+      <div class="serv-card" data-animate="serv">
+        <div class="serv-num">03</div>
+        <div class="serv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <h3>SEO Optimization</h3>
+        <p>On-page and technical SEO so your store is clean, fast, and easy for customers to find.</p>
+        <ul><li>Keyword research</li><li>JSON-LD schema</li><li>Internal linking</li><li>Audits</li></ul>
+      </div>
+      <div class="serv-card" data-animate="serv">
+        <div class="serv-num">04</div>
+        <div class="serv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div>
+        <h3>Performance &amp; CRO</h3>
+        <p>Speed, Core Web Vitals, and conversion-rate work so the traffic you earn actually turns into sales.</p>
+        <ul><li>Speed optimization</li><li>Core Web Vitals</li><li>A/B ideas</li><li>Landing pages</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS (rotating dial) -->
+<section class="dial-sec" id="process">
+  <div class="dial-pin">
+    <div class="wrap">
+      <div class="dial-head">
+        <span class="eyebrow" data-animate="fade-up">How I work</span>
+        <h2 class="reveal-words" data-animate>A clear, proven process</h2>
+      </div>
+      <div class="dial" data-steps="4">
+        <div class="dial-arc"></div>
+        <div class="dial-badge"><span class="dlbl">Step</span><b class="dnum">01</b></div>
+        <div class="dial-content">
+          <article class="dial-item is-on" data-i="0">
+            <h3>Discover</h3>
+            <p>I start by getting clear on your brand, your goals, and what success looks like, so the build has real direction from day one.</p>
+            <div class="dial-tags"><span>Brand</span><span>Goals</span><span>Direction</span></div>
+          </article>
+          <article class="dial-item" data-i="1">
+            <h3>Design</h3>
+            <p>I design clean, on-brand layouts with clear hierarchy that guide your visitors straight toward the action that matters.</p>
+            <div class="dial-tags"><span>Layout</span><span>Hierarchy</span><span>UX</span></div>
+          </article>
+          <article class="dial-item" data-i="2">
+            <h3>Build</h3>
+            <p>I build it fast and clean on Shopify or Framer, with speed and a solid structure baked in from the very first section.</p>
+            <div class="dial-tags"><span>Shopify</span><span>Framer</span><span>Speed</span></div>
+          </article>
+          <article class="dial-item" data-i="3">
+            <h3>Launch</h3>
+            <p>I launch, test everything end to end, and hand it over set up so it stays easy for you to update and grow.</p>
+            <div class="dial-tags"><span>QA</span><span>Handoff</span><span>Growth</span></div>
+          </article>
+        </div>
+        <div class="dial-ring">
+          <span class="dial-node" data-i="0"><span>01</span></span>
+          <span class="dial-node" data-i="1"><span>02</span></span>
+          <span class="dial-node" data-i="2"><span>03</span></span>
+          <span class="dial-node" data-i="3"><span>04</span></span>
+        </div>
+      </div>
+      <div class="dial-foot">
+        <span class="dial-count"><b>01</b> <i>/ 04</i></span>
+        <div class="dial-dots"><i class="on"></i><i></i><i></i><i></i></div>
+        <a href="contact.html" class="btn btn-primary" data-magnetic="0.3">Start a project
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT I DELIVER — 3D marquee -->
+<section class="deliver-sec" aria-label="What I deliver">
+  <div class="deliver-pin">
+  <div class="wrap deliver-head">
+    <span class="eyebrow" data-animate="fade-up">What I deliver</span>
+    <h2 data-animate="fade-up" data-delay="1">Design. Build. <span class="grad">Convert.</span></h2>
+    <p data-animate="fade-up" data-delay="2">Stores and sites that look premium, load fast, and turn visitors into paying customers.</p>
+  </div>
+  <div class="deliver-marquee" data-animate="fade-up" data-delay="2" aria-hidden="true">
+    <div class="dm-tilt">
+      <div class="dm-row dm-row1">
+        <a class="dm-card" href="project.html?p=trydent"><img src="assets/img/projects/trydent-cf.jpg" alt="Trydent store" decoding="async" fetchpriority="low"><span class="dm-name">Trydent</span></a>
+        <a class="dm-card" href="project.html?p=poweroxx"><img src="assets/img/projects/poweroxx-cf.jpg" alt="PoweRoxx store" decoding="async" fetchpriority="low"><span class="dm-name">PoweRoxx</span></a>
+        <a class="dm-card" href="project.html?p=the-funky-fitz"><img src="assets/img/projects/the-funky-fitz-cf.jpg" alt="The Funky Fitz store" decoding="async" fetchpriority="low"><span class="dm-name">The Funky Fitz</span></a>
+        <a class="dm-card" href="project.html?p=taneja-cloth-house"><img src="assets/img/projects/taneja-cloth-house-cf.jpg" alt="Taneja Cloth House store" decoding="async" fetchpriority="low"><span class="dm-name">Taneja Cloth House</span></a>
+        <a class="dm-card" href="project.html?p=kurta-pyjama-ca"><img src="assets/img/projects/kurta-pyjama-ca-cf.jpg" alt="Kurta Pyjama CA store" decoding="async" fetchpriority="low"><span class="dm-name">Kurta Pyjama CA</span></a>
+        <a class="dm-card" href="project.html?p=blackout-lifting-club"><img src="assets/img/projects/blackout-lifting-club-cf.jpg" alt="Blackout Lifting Club store" decoding="async" fetchpriority="low"><span class="dm-name">Blackout Lifting Club</span></a>
+      </div>
+      <div class="dm-row dm-row2">
+        <figure class="dm-card dm-cap"><span class="dmc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></span><b>Speed</b><small>Core Web Vitals</small></figure>
+        <figure class="dm-card dm-cap"><span class="dmc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><b>Custom Sections</b><small>Built to your brand</small></figure>
+        <figure class="dm-card dm-cap"><span class="dmc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><b>SEO-ready</b><small>Clean &amp; structured</small></figure>
+        <figure class="dm-card dm-cap"><span class="dmc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg></span><b>Conversion</b><small>CRO-focused builds</small></figure>
+        <figure class="dm-card dm-cap"><span class="dmc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></span><b>Framer CMS</b><small>Dynamic content</small></figure>
+        <figure class="dm-card dm-cap"><span class="dmc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v5M15 2v5M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v6"/></svg></span><b>Integrations</b><small>Apps &amp; tools</small></figure>
+        <figure class="dm-card dm-cap"><span class="dmc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg></span><b>Clean Design</b><small>Premium feel</small></figure>
+      </div>
+    </div>
+  </div>
+  <div class="dm-progress" aria-hidden="true"><i></i></div>
+  </div>
+</section>
+
+<!-- ABOUT TEASER -->
+<section class="section">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow" data-animate="fade-up">About</span>
+      <p class="lead" data-animate="fade-up" data-delay="1" style="margin-top:1.2rem">
+        I'm Satyam, a <span class="hl">Shopify &amp; Framer developer</span> who cares about the same things you do:
+        sites that load fast, look premium, and actually <span class="hl">make money</span>.
+      </p>
+      <div class="prose">
+        <p data-animate="fade-up" data-delay="2">Over 3.5+ years I've built and managed 15+ Shopify and Framer websites across fashion, healthcare, lifestyle and eCommerce. I pair clean design with fast, solid builds, so the work doesn't just look good, it sells.</p>
+      </div>
+      <div style="margin-top:1.8rem" data-animate="fade-up" data-delay="3">
+        <a href="about.html" class="btn btn-primary" data-magnetic="0.3">More about me
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="about-portrait" data-animate="zoom" data-delay="1">
+      <div class="orbit-scene" aria-hidden="true">
+        <span class="orbit-ring r1"></span><span class="orbit-ring r2"></span>
+        <span class="orbit-ic i1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg></span>
+        <span class="orbit-ic i2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 2h14v7h-7zM5 9h7l7 7h-7v7l-7-7z"/></svg></span>
+        <span class="orbit-ic i3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg></span>
+        <span class="orbit-ic i4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>
+        <span class="orbit-core">SS</span>
+      </div>
+      <div class="badge"><div><b>Satyam Shakkarwal</b><br><span style="opacity:.85;font-size:.85rem">Shopify &amp; Framer Developer</span></div><b style="font-size:1.4rem">4.9★</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" data-animate="fade-up">Kind words</span>
+        <h2 class="reveal-words" data-animate>What clients say</h2>
+      </div>
+      <p data-animate="fade-up" data-delay="1">Good work gets noticed. Here's what brands say after launch.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi" data-animate="fade-up">
+        <div class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div>
+        <p>"A clean, modern website that perfectly matched our brand and significantly improved how we look online."</p>
+        <div class="who"><div class="av" style="background:linear-gradient(135deg,#E2541F,#C0392B)">F</div><div><b>FragFreak</b><span>eCommerce · Shopify</span></div></div>
+      </div>
+      <div class="testi" data-animate="fade-up" data-delay="1">
+        <div class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div>
+        <p>"The entire process was smooth from start to finish. Fast delivery and great communication throughout."</p>
+        <div class="who"><div class="av" style="background:linear-gradient(135deg,#5B2A86,#B23A8E)">P</div><div><b>Perfy You</b><span>Jewellery · Shopify</span></div></div>
+      </div>
+      <div class="testi" data-animate="fade-up" data-delay="2">
+        <div class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div>
+        <p>"From design to development, every detail felt thoughtful. The final website exceeded our expectations."</p>
+        <div class="who"><div class="av" style="background:linear-gradient(135deg,#145A32,#2D9CDB)">C</div><div><b>Creative Inktales</b><span>Creative · Shopify</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section">
+  <div class="wrap">
+    <div class="cta-band" data-animate="zoom">
+      <h2 class="reveal-words" data-animate>Let's build something premium</h2>
+      <p>Have a store or site in mind? Tell me about it and I'll show you how to make it faster, cleaner, and ready to sell.</p>
+      <a href="contact.html" class="btn btn-primary btn-lg" data-magnetic="0.3">Start a project
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <div class="footer-big"><a href="contact.html">Let's talk →</a></div>
+        <p style="color:var(--text-2);max-width:34ch">Shopify &amp; Framer developer building fast, premium websites that look great and convert.</p>
+        <img class="footer-sign" src="assets/img/logos/satyam-sign.png" alt="Satyam Createss signature" loading="lazy" />
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Pages</h5>
+          <a href="index.html">Home</a><a href="projects.html">Projects</a><a href="about.html">About</a><a href="contact.html">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h5>Connect</h5>
+          <a href="https://www.instagram.com/satyam.createss/" target="_blank" rel="noopener">Instagram</a>
+          <a href="mailto:sam.createsssss@gmail.com">Email</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> Satyam Shakkarwal. All rights reserved.</span>
+      <span>Dwarka, Delhi · India</span>
+    </div>
+  </div>
+</footer>
+
+<button class="to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:20px;height:20px"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
+<script src="assets/js/main.js?v=36"></script>
+</body>
+</html>

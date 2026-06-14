@@ -1,0 +1,13 @@
+# OS junk
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+
+# Capture / build artifacts (not part of the site)
+assets/img/projects/_*.json
+_blank.html
+*.log
