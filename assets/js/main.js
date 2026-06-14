@@ -364,6 +364,7 @@
       return scrollable > 0 ? Math.max(0, Math.min(1, -r.top / scrollable)) : 0;
     }
     function render() {
+      targetP = computeTarget();                 // read scroll geometry inside the frame (not per scroll event)
       curP += (targetP - curP) * 0.085;
       if (Math.abs(targetP - curP) < 0.0004) { curP = targetP; layout(curP); running = false; return; }
       layout(curP);
@@ -379,11 +380,17 @@
       if (immediate) { curP = targetP; layout(curP); return; }
       if (!running) { running = true; requestAnimationFrame(render); }
     }
+    // scroll just keeps the render loop alive; the geometry read lives in render() = no per-event reflow
+    function kick() {
+      if (flat()) { update(false); return; }
+      if (mode !== "3d") { mode = "3d"; section.classList.remove("cf-flat"); cardW = cards[0].offsetWidth || 360; }
+      if (!running) { running = true; requestAnimationFrame(render); }
+    }
     let inView = true;
     if ("IntersectionObserver" in window) {
-      new IntersectionObserver((es) => { inView = es[0].isIntersecting; if (inView) update(false); }, { rootMargin: "300px 0px" }).observe(section);
+      new IntersectionObserver((es) => { inView = es[0].isIntersecting; if (inView) kick(); }, { rootMargin: "300px 0px" }).observe(section);
     }
-    window.addEventListener("scroll", () => { if (inView) update(false); }, { passive: true });
+    window.addEventListener("scroll", () => { if (inView) kick(); }, { passive: true });
     window.addEventListener("resize", () => { cardW = cards[0].offsetWidth || cardW; update(true); });
     dots.forEach((d) => d.addEventListener("click", () => {
       if (flat()) return;
@@ -467,6 +474,7 @@
     function build() {
       const W = document.documentElement.clientWidth;
       const H = document.body.scrollHeight;
+      lastH = H;                                  // cache height so frame() never reads layout
       const pts = waypoints(W);
       if (pts.length < 3) return;
       let d = "M" + pts[0][0].toFixed(1) + "," + pts[0][1].toFixed(1);
@@ -496,8 +504,6 @@
 
     function frame() {
       ticking = false;
-      const doc = document.documentElement;
-      if (doc.scrollHeight !== lastH) { lastH = doc.scrollHeight; build(); }
       if (!fill || !samples.length) return;
       wrap.classList.toggle("is-on", scrollY > 30);
       // anchor the tip to what the viewer is looking at (so it never drifts away on long sections):
@@ -515,10 +521,18 @@
     }
     addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
     let rsz = null;
-    addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(() => { lastH = 0; frame(); }, 220); }, { passive: true });
+    addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(() => { build(); frame(); }, 220); }, { passive: true });
     // sections settle after fonts/images load; rebuild once everything is final
-    addEventListener("load", () => { lastH = 0; frame(); });
-    frame();
+    addEventListener("load", () => { build(); frame(); });
+    // rebuild only when the page height truly changes (no per-frame scrollHeight read = no forced reflow while scrolling)
+    if ("ResizeObserver" in window) {
+      let rb = null;
+      new ResizeObserver(() => {
+        if (document.body.scrollHeight === lastH) return;
+        clearTimeout(rb); rb = setTimeout(() => { build(); frame(); }, 60);
+      }).observe(document.body);
+    }
+    build(); frame();
   }
 
   /* ----------  ABOUT PAGE FX (parallax word, ignite text, journey draw, portrait tilt)  ---------- */
@@ -551,7 +565,8 @@
     }
 
     const rows = journey ? $$(".jrow", journey) : [];
-    let litWords = -1, litRows = -1, ticking = false;
+    let rowTops = [], litWords = -1, litRows = -1, ticking = false;
+    const measureRows = () => { rowTops = rows.map((r) => r.offsetTop); };  // cache (constant) so frame() never reads offsetTop after a style write
     function frame() {
       ticking = false;
       const vh = window.innerHeight;
@@ -571,12 +586,15 @@
         journey.style.setProperty("--jprog", p.toFixed(4));
         const fillY = p * r.height;
         let n = 0;
-        for (let i = 0; i < rows.length; i++) { if (rows[i].offsetTop + 10 <= fillY) n = i + 1; }
+        for (let i = 0; i < rows.length; i++) { if (rowTops[i] + 10 <= fillY) n = i + 1; }
         if (n !== litRows) { rows.forEach((row, i) => row.classList.toggle("lit", i < n)); litRows = n; }
       }
     }
     addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
-    frame();
+    let arz = null;
+    addEventListener("resize", () => { clearTimeout(arz); arz = setTimeout(() => { measureRows(); frame(); }, 200); }, { passive: true });
+    addEventListener("load", () => { measureRows(); frame(); });
+    measureRows(); frame();
 
     // cursor 3D tilt on the orbit portrait
     const portrait = $(".about-portrait");
@@ -632,14 +650,22 @@
   /* ----------  SCROLL PROGRESS + TO-TOP  ---------- */
   function scrollFx() {
     const prog = $(".scroll-prog"), top = $(".to-top");
-    const onScroll = () => {
-      const h = document.documentElement;
-      const sc = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
-      if (prog) prog.style.width = (sc * 100) + "%";
-      if (top) top.classList.toggle("show", h.scrollTop > 600);
+    // cache the scrollable height so the scroll handler never reads layout
+    // (reading scrollHeight per scroll event forces a sync reflow = jank)
+    let maxScroll = 1, ticking = false;
+    const measure = () => { const h = document.documentElement; maxScroll = (h.scrollHeight - h.clientHeight) || 1; };
+    const frame = () => {
+      ticking = false;
+      const y = window.scrollY || window.pageYOffset || 0;
+      if (prog) prog.style.width = ((y / maxScroll) * 100) + "%";
+      if (top) top.classList.toggle("show", y > 600);
     };
+    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    window.addEventListener("resize", () => { measure(); onScroll(); }, { passive: true });
+    window.addEventListener("load", measure);
+    frame();
     if (top) top.addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }));
   }
 
@@ -681,9 +707,10 @@
     skewEls.forEach((el) => { el.style.willChange = "transform"; });
     const paraEls = $$(".sec-head, .logos-head"); // heading blocks drift for depth (compose with child reveals)
     const heroEl = $(".hero"), heroShow = $(".hero-show"), heroCopy = $(".hero-copy");
-    let lastY = window.scrollY, vel = 0, raf = null, idle = 0;
+    let lastY = window.scrollY, vel = 0, raf = null, idle = 0, reset = false;
     function loop() {
       const y = window.scrollY;
+      if (reset) { lastY = y; reset = false; }   // avoid a velocity spike when the loop restarts
       const dv = y - lastY; lastY = y;
       vel += (dv - vel) * 0.2;
       const v = Math.max(-58, Math.min(58, vel));
@@ -708,7 +735,7 @@
       if (idle > 26) { raf = null; return; }
       raf = requestAnimationFrame(loop);
     }
-    window.addEventListener("scroll", () => { if (!raf) { lastY = window.scrollY; raf = requestAnimationFrame(loop); } }, { passive: true });
+    window.addEventListener("scroll", () => { if (!raf) { reset = true; raf = requestAnimationFrame(loop); } }, { passive: true });
     loop();
   }
 
@@ -1362,6 +1389,7 @@
     }
     function loop() {
       raf = null;
+      compute();                              // read scroll geometry inside the frame (no per-event reflow)
       cur += (target - cur) * 0.12;
       if (Math.abs(target - cur) < 0.0008) cur = target;
       ring.style.transform = `rotate(${-(cur - mid) * STEP}deg)`;
@@ -1383,8 +1411,8 @@
     function kick() { if (vis && !raf) raf = requestAnimationFrame(loop); }
     const io = new IntersectionObserver((es) => { vis = es[0].isIntersecting; kick(); }, {});
     io.observe(sec);
-    window.addEventListener("scroll", () => { compute(); kick(); }, { passive: true });
-    window.addEventListener("resize", () => { setR(); compute(); kick(); }, { passive: true });
+    window.addEventListener("scroll", kick, { passive: true });
+    window.addEventListener("resize", () => { setR(); kick(); }, { passive: true });
     compute(); cur = target; loop();
   }
 
