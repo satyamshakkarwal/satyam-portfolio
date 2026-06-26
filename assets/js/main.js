@@ -1528,6 +1528,33 @@
     groups.forEach((g) => io.observe(g));
   }
 
+  /* ----------  FASTER NAVIGATION: warm the next page on intent  ---------- */
+  function prefetchNav() {
+    const seen = new Set();
+    const internal = (h) => h && !/^(https?:|mailto:|tel:|#|javascript:)/i.test(h) && /(\.html|\?p=)/.test(h);
+    const warm = (h) => {
+      if (!internal(h) || seen.has(h)) return; seen.add(h);
+      const l = document.createElement("link"); l.rel = "prefetch"; l.as = "document"; l.href = h; document.head.appendChild(l);
+      try { fetch(h, { credentials: "same-origin", priority: "low" }).catch(() => {}); } catch (e) {}
+    };
+    $$("a[href]").forEach((a) => {
+      const h = a.getAttribute("href");
+      if (!internal(h)) return;
+      const go = () => warm(h);
+      a.addEventListener("pointerenter", go, { passive: true });
+      a.addEventListener("touchstart", go, { passive: true });
+    });
+    // Chromium: prerender the main pages on hover/press intent -> navigation is instant
+    try {
+      if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
+        const sr = document.createElement("script");
+        sr.type = "speculationrules";
+        sr.textContent = JSON.stringify({ prerender: [{ urls: ["index.html", "projects.html", "about.html", "contact.html"], eagerness: "moderate" }] });
+        document.body.appendChild(sr);
+      }
+    } catch (e) {}
+  }
+
   function init() {
     splitWords();
     preloader();
@@ -1535,6 +1562,7 @@
     reveal();
     marquee();
     lazyMedia();
+    prefetchNav();
     curvedLogos();
     magnetic();
     counters();
