@@ -35,20 +35,14 @@
   function preloader() {
     const pre = $(".preloader");
     if (!pre) { document.body.classList.add("loaded"); document.dispatchEvent(new Event("app:loaded")); return; }
-    // The full intro plays only ONCE per session. After that, moving between pages reveals
-    // instantly (a quick fade) instead of replaying the ~2.5s loader every navigation.
-    let seen = false; try { seen = !!sessionStorage.getItem("sx_seen"); } catch (e) {}
-    if (reduce || seen) {
-      try { sessionStorage.setItem("sx_seen", "1"); } catch (e) {}
+    // reduced-motion users skip straight to the content
+    if (reduce) {
       document.body.classList.remove("no-scroll");
       document.body.classList.add("loaded");
       document.dispatchEvent(new Event("app:loaded"));
-      pre.style.transition = "opacity .28s ease";
-      requestAnimationFrame(() => { pre.style.opacity = "0"; });
-      setTimeout(() => pre.remove(), 300);
+      pre.remove();
       return;
     }
-    try { sessionStorage.setItem("sx_seen", "1"); } catch (e) {}
     const word = (pre.dataset.word || "WELCOME").toUpperCase();
     const chars = word.split("").map((c) => `<span>${c}</span>`).join("");
     const verbs = PRE_VERBS.map((v) => `<span>${v}</span>`).join("");
@@ -78,7 +72,8 @@
       const raw = Math.min(1, (performance.now() - t0) / DUR);
       const e = 1 - Math.pow(1 - raw, 2);
       const p = Math.round(e * 100);
-      if (bar) bar.style.width = p + "%";
+      // bar fills via a CSS (compositor) animation so it stays smooth even while the main thread
+      // is busy rendering the page; JS only updates the small count + triggers the finish.
       if (count) count.textContent = String(p).padStart(3, "0");
       if (raw < 1) requestAnimationFrame(tick);
       else setTimeout(finish, 420);
@@ -456,7 +451,7 @@
     if (!wrap || reduce || window.innerWidth < 900) return;
     let fill = null, glow = null, len = 0, lastH = 0;
     let samples = [], curOff = 0, targetOff = 0, animRaf = null, isOn = false;
-    const SN = 420;
+    const SN = 220;
     const yMid = (el) => { if (!el) return 0; const r = el.getBoundingClientRect(); return r.top + scrollY + r.height / 2; };
     const yTop = (el) => { if (!el) return 0; return el.getBoundingClientRect().top + scrollY; };
 
@@ -560,12 +555,14 @@
     addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(build, 220); }, { passive: true });
     // sections settle after fonts/images load; rebuild once everything is final
     addEventListener("load", build);
-    // rebuild only when the page height truly changes (no per-frame scrollHeight read = no forced reflow while scrolling)
+    // rebuild only when the page height truly changes — and only AFTER load, so the page settling
+    // during initial load doesn't trigger repeated expensive rebuilds (that was stuttering the loader)
     if ("ResizeObserver" in window) {
-      let rb = null;
+      let rb = null, ready = false;
+      addEventListener("load", () => { setTimeout(() => { ready = true; }, 400); });
       new ResizeObserver(() => {
-        if (document.body.scrollHeight === lastH) return;
-        clearTimeout(rb); rb = setTimeout(build, 60);
+        if (!ready || Math.abs(document.body.scrollHeight - lastH) < 40) return;
+        clearTimeout(rb); rb = setTimeout(build, 280);
       }).observe(document.body);
     }
     build();
@@ -1556,47 +1553,31 @@
   }
 
   function init() {
-    splitWords();
-    preloader();
-    cursor();
-    reveal();
-    marquee();
-    lazyMedia();
-    prefetchNav();
-    curvedLogos();
-    magnetic();
-    counters();
-    skillBars();
-    spine();
-    aboutFX();
-    nav();
-    scrollFx();
-    parallax();
-    scrollWild();
-    deliverScroll();
-    hydrateCards();
-    filters();
-    tilt3d();
-    cards3d();
-    converge();
-    collage();
-    heroSpot();
-    rotateWord();
-    heroShow();
-    processDial();
-    // pause heavy continuous animations whenever their section is off-screen (saves GPU while scrolling)
-    (function () {
+    preloader();   // start the loader first so it can animate on a clear main thread
+    splitWords();  // light, and reveal() depends on it
+    const pauseOffscreen = function () {
       if (!("IntersectionObserver" in window)) return;
       [[$(".hero"), $(".hero")], [$(".cta-band"), $(".cta-band")]].forEach(([watch, target]) => {
         if (!watch || !target) return;
         new IntersectionObserver((es) => { target.classList.toggle("is-paused", !es[0].isIntersecting); }, { rootMargin: "80px" }).observe(watch);
       });
+    };
+    // Time-slice the heavy setup across frames. Previously every function ran synchronously and
+    // froze the main thread for ~600ms+, which made the PRELOADER stutter. Now we run a few ms of
+    // work per frame and yield, so the loader (and everything else) stays smooth.
+    const tasks = [
+      reveal, nav, year, contactForm, seo, projectDetail, cursor, magnetic,
+      marquee, lazyMedia, prefetchNav, curvedLogos, counters, skillBars,
+      scrollFx, parallax, heroSpot, rotateWord, heroShow, hydrateCards, filters,
+      tilt3d, collage, aboutFX, cards3d, converge, processDial, deliverScroll,
+      scrollWild, pauseOffscreen, coverflow, spine,
+    ];
+    let i = 0;
+    (function run() {
+      const t0 = performance.now();
+      do { try { if (tasks[i]) tasks[i](); } catch (e) {} i++; } while (i < tasks.length && performance.now() - t0 < 6);
+      if (i < tasks.length) requestAnimationFrame(run);
     })();
-    coverflow();
-    projectDetail();
-    contactForm();
-    seo();
-    year();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();

@@ -160,7 +160,8 @@ h1, h2, h3, h4, .display {
 @keyframes preChar { 55%{opacity:1;} to { transform: translateY(0) rotateX(0) scale(1); opacity:1; } }
 .pre-sub { font-size: .72rem; letter-spacing: .3em; text-transform: uppercase; color: var(--accent); font-weight: 600; opacity: 0; animation: preFade .6s ease .75s forwards; }
 .pre-bar { width: min(240px, 58vw); height: 3px; background: var(--border-2); position: relative; overflow: hidden; border-radius: 3px; }
-.pre-bar i { position: absolute; inset: 0; width: 0%; border-radius: 3px; background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
+.pre-bar i { position: absolute; inset: 0; width: 100%; transform: scaleX(0); transform-origin: left center; border-radius: 3px; background: linear-gradient(90deg, var(--accent-2), var(--accent)); animation: preFill 2s cubic-bezier(.25,.7,.25,1) .18s both; }
+@keyframes preFill { to { transform: scaleX(1); } }
 .pre-count { font-family: "Space Grotesk", sans-serif; font-variant-numeric: tabular-nums; color: var(--text-2); font-size: .82rem; letter-spacing: .22em; }
 .pre-spark { position: absolute; inset: 0; pointer-events: none; }
 .pre-spark i { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); opacity: 0; animation: spark 2.8s ease-in infinite; }
@@ -199,6 +200,11 @@ h1, h2, h3, h4, .display {
 [data-theme="dark"] .preloader::before { opacity: .72; }
 [data-theme="dark"] .pre-orbit { opacity: .4; }
 .pre-plus { background: linear-gradient(var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* MOBILE: the 3 blur(62px) blobs + blur(50px) glow are very expensive to raster on phone GPUs and
+   were stuttering the loader. Drop them on small screens — the logos/word/bar/orbit carry the intro. */
+@media (max-width: 820px) {
+  .preloader::before, .pre-liq, .pre-spark { display: none !important; }
+}
 
 /* ----------  CURSOR  ---------- */
 .cursor-dot, .cursor-ring {
