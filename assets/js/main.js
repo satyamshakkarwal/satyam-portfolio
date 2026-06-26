@@ -35,6 +35,20 @@
   function preloader() {
     const pre = $(".preloader");
     if (!pre) { document.body.classList.add("loaded"); document.dispatchEvent(new Event("app:loaded")); return; }
+    // The full intro plays only ONCE per session. After that, moving between pages reveals
+    // instantly (a quick fade) instead of replaying the ~2.5s loader every navigation.
+    let seen = false; try { seen = !!sessionStorage.getItem("sx_seen"); } catch (e) {}
+    if (reduce || seen) {
+      try { sessionStorage.setItem("sx_seen", "1"); } catch (e) {}
+      document.body.classList.remove("no-scroll");
+      document.body.classList.add("loaded");
+      document.dispatchEvent(new Event("app:loaded"));
+      pre.style.transition = "opacity .28s ease";
+      requestAnimationFrame(() => { pre.style.opacity = "0"; });
+      setTimeout(() => pre.remove(), 300);
+      return;
+    }
+    try { sessionStorage.setItem("sx_seen", "1"); } catch (e) {}
     const word = (pre.dataset.word || "WELCOME").toUpperCase();
     const chars = word.split("").map((c) => `<span>${c}</span>`).join("");
     const verbs = PRE_VERBS.map((v) => `<span>${v}</span>`).join("");
