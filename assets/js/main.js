@@ -316,7 +316,7 @@
     const platEl = document.getElementById("cf-plat");
     const linkEl = document.getElementById("cf-link");
     const dotsEl = document.getElementById("cf-dots");
-    const ORDER = ["taneja-cloth-house", "fragfreak", "perfy-you", "creative-inktales", "helping-life-foundation", "poweroxx", "the-funky-fitz", "trydent"];
+    const ORDER = ["millionaire-fragrances", "fragfreak", "the-funky-fitz", "taneja-cloth-house", "perfy-you", "creative-inktales", "helping-life-foundation", "poweroxx", "trydent"];
     const items = ORDER.map((s) => ({ slug: s, p: PROJECTS[s] })).filter((x) => x.p);
     if (!items.length) return;
 
@@ -326,7 +326,7 @@
         ? `<img src="assets/img/projects/${slug}-cf.jpg" alt="${p.name} website" decoding="async">`
         : `<div class="mesh ${p.mesh}"></div>`;
       return `<a class="cf-card" href="project.html?p=${slug}">
-        <div class="cf-frame"><div class="cf-bar"><i></i><i></i><i></i><b>${host}</b></div>${media}</div>
+        <div class="cf-frame"><div class="cf-bar"><i></i><i></i><i></i><b>${host}</b></div>${media}${NEW_WORK.has(slug) ? '<span class="proj-new">New</span>' : ""}</div>
         <div class="cf-cap"><b>${p.name}</b><span>${p.platform}</span></div>
       </a>`;
     }).join("");
@@ -414,7 +414,7 @@
       if (flat()) return;
       const i = parseInt(d.dataset.i, 10);
       const scrollable = section.offsetHeight - window.innerHeight;
-      window.scrollTo({ top: section.offsetTop + (i / (N - 1)) * scrollable, behavior: reduce ? "auto" : "smooth" });
+      scrollToY(section.offsetTop + (i / (N - 1)) * scrollable, 1.1);
     }));
     setInfo(0);
     update(true);
@@ -680,6 +680,34 @@
     });
   }
 
+  /* ----------  SMOOTH SCROLL (Lenis)  ---------- */
+  // Desktop mouse / trackpad only. Phones and tablets keep native momentum scrolling (already
+  // smooth, and it leaves the mobile perf work untouched). Reduced-motion users keep native too.
+  let lenis = null;
+  const easeInOutQuart = (t) => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2);
+  function smoothScroll() {
+    if (reduce || typeof window.Lenis !== "function") return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    try {
+      lenis = new window.Lenis({
+        lerp: 0.08,          // lower = longer, softer glide after each wheel tick
+        wheelMultiplier: 1,
+        smoothWheel: true,
+        autoRaf: true,
+        prevent: (node) => !!(node.classList && node.classList.contains("mobile-menu")),
+      });
+    } catch (e) { lenis = null; return; }
+    // the preloader and the mobile menu lock the page with body.no-scroll; keep Lenis in step
+    const sync = () => { if (document.body.classList.contains("no-scroll")) lenis.stop(); else lenis.start(); };
+    sync();
+    new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  }
+  // every scripted scroll goes through here so it uses the same glide
+  function scrollToY(y, dur) {
+    if (lenis) lenis.scrollTo(y, { duration: dur || 1.2, easing: easeInOutQuart });
+    else window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
+  }
+
   /* ----------  SCROLL PROGRESS + TO-TOP  ---------- */
   function scrollFx() {
     const prog = $(".scroll-prog"), top = $(".to-top");
@@ -699,7 +727,7 @@
     window.addEventListener("resize", () => { measure(); onScroll(); }, { passive: true });
     window.addEventListener("load", measure);
     frame();
-    if (top) top.addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }));
+    if (top) top.addEventListener("click", () => scrollToY(0, 1.4));
   }
 
   /* ----------  PARALLAX BLOBS  ---------- */
@@ -904,15 +932,28 @@
 
   /* ----------  PROJECT DATA  ---------- */
   const PROJECTS = {
+    "millionaire-fragrances": { name: "Millionaire Fragrances", year: "2026", platform: "Shopify", mesh: "mesh-b",
+      tagline: "A luxury perfume store on Shopify with 2,500+ designer, niche and Middle Eastern fragrances.",
+      industry: "Luxury Fragrance / eCommerce",
+      overview: ["Millionaire Fragrances sells original designer, niche and Middle Eastern perfumes across India. I built the Shopify store end to end: the design, the homepage, the product pages and a catalog of more than 2,500 fragrances.",
+        "The goal was simple. Make an online perfume store feel as premium as the bottles it sells, and make every fragrance easy to understand before someone buys it."],
+      challenge: ["Perfume is hard to sell online because nobody can smell it through a screen. Buyers want to know how a scent opens, how it dries down and when to wear it, and at luxury prices they also need to trust that the bottle is genuine.",
+        "On top of that, the catalog was huge. More than 2,500 products across three very different worlds had to be added, priced and organized without the store feeling cluttered or slow."],
+      approach: ["I split the store into three clear worlds, Designer, Niche and Middle Eastern, so shoppers always know where they are. The homepage opens with a video hero, then leads into New Arrivals, the collections and the bestsellers.",
+        "Every product page explains the scent: key notes, the fragrance family, the best season and time of day to wear it, plus a custom notes infographic I designed for all 2,500+ products. Dispatch times, delivery windows and authenticity badges sit right next to the buy buttons.",
+        "Behind the scenes I rebuilt the whole catalog through clean bulk imports, so prices, sizes and testers stay correct and the store is easy to keep growing."],
+      services: ["Shopify", "Custom Liquid", "Design", "Catalog Build"],
+      results: [{n:"2500+",l:"Products live"},{n:"100%",l:"With a notes infographic"}], live: null, shots: null, next: "taneja-cloth-house" },
+
     "fragfreak": { name: "FragFreak", year: "2026", platform: "Shopify", mesh: "mesh-a",
-      tagline: "A bold fragrance store built for fast browsing and scent-led shopping.",
+      tagline: "A fragrance store with 1,400+ perfumes, redesigned for easy browsing and scent-led shopping.",
       industry: "Fragrance / eCommerce",
-      overview: ["FragFreak needed a store that felt as premium as the scents it sells. I designed and built a fast Shopify storefront with rich product pages, clear collections, and a checkout tuned to keep buyers moving.",
+      overview: ["FragFreak sells Arabian, designer and niche perfumes in full bottles and decants. I redesigned the whole Shopify store, from the header and homepage to the collection and product pages, so a catalog of more than 1,400 perfumes is easy to browse and every fragrance sells on its notes.",
         "Speed and a clean structure were baked in from day one, so the store doesn't just look good, it sells."],
       challenge: ["The biggest challenge was making a fragrance store feel as premium online as the scents feel in person, without slowing the site down. Perfume sells on emotion and detail, so the product pages needed rich imagery and clear scent-led storytelling while staying fast and easy to browse across a growing catalog.",
         "On top of that, the storefront had to stay clean and simple to manage so the brand could keep adding new fragrances and collections over time."],
-      approach: ["I built a custom Shopify storefront with a strong visual hierarchy, scent-led collection pages, and clean product pages that put each fragrance front and centre. Speed and a solid structure were baked in from the first section, so the store loads quickly and stays easy to expand.",
-        "The checkout flow was tightened to keep buyers moving from browse to purchase with as little friction as possible, and the whole build was kept consistent and lightweight.",
+      approach: ["The new design has a richer, darker header with search up front, a rotating hero of featured bottles, a brand ticker and seasonal edits like wedding and winter picks. Product cards show the key notes and every size before you even click.",
+        "Product pages now answer the real questions: what it smells like, when to wear it and how long it lasts. Shoppers can try a scent as an 8 ML decant first, see delivery times up front, and get a WhatsApp alert when a sold-out perfume is back in stock.",
         "The result is a premium, fast fragrance store that looks the part and is built to convert and scale."],
       services: ["Shopify", "eCommerce", "Design", "CRO"],
       results: [{n:"100%",l:"Clean build"},{n:"<2s",l:"Load target"}], live: null, shots: null, next: "perfy-you" },
@@ -963,17 +1004,18 @@
       services: ["Shopify", "Personalization", "Custom checkout", "UI / UX"],
       results: [{n:"Custom",l:"Upload flow"},{n:"COD",l:"Rules"}], live: null, shots: null, next: "the-funky-fitz" },
 
-    "the-funky-fitz": { name: "The Funky Fitz", year: "2024", platform: "Shopify", mesh: "mesh-f",
-      tagline: "A bold, colourful streetwear store on Shopify, plus apparel design and ads.",
+    "the-funky-fitz": { name: "The Funky Fitz", year: "2026", platform: "Shopify", mesh: "mesh-f",
+      tagline: "A Delhi streetwear store, rebuilt from scratch in black and white with a clothes-rail hero.",
       industry: "Streetwear / Fashion",
-      overview: ["The Funky Fitz is a modern streetwear and fashion eCommerce brand built on Shopify, designed with a bold, colorful, and energetic aesthetic that reflects the brand's youthful and creative identity. The website was created to deliver a smooth and visually engaging shopping experience while maintaining strong brand consistency."],
-      challenge: ["One of the main challenges was creating a website that matched the client's vision of a cool, funky, and visually vibrant brand while still maintaining a clean and smooth shopping experience. The client wanted the website aesthetics, layouts, and color palette to feel energetic and unique without compromising usability or performance.",
-        "Another major part of the project involved continuously creating t-shirt, hoodie, and apparel designs based on the client's changing requirements and fashion direction. Along with website management, handling the overall process from design execution to ads and sales-focused campaigns was also an important responsibility throughout the project."],
-      approach: ["I built a bold, colourful Shopify store with streetwear-inspired layouts that matched the brand. Navigation, responsive design, and browsing were kept smooth so the site stays lively but still easy to use.",
-        "Alongside building and maintaining the store, I kept designing t-shirt, hoodie, and apparel graphics as the client's direction changed, and ran the ad creatives and sales campaigns too.",
-        "The store keeps its high-energy look while staying easy to shop, and it gave The Funky Fitz a consistent brand to grow with."],
-      services: ["Shopify", "Apparel design", "Ads", "eCommerce"],
-      results: [{n:"Design",l:"+ Ads"},{n:"Bold",l:"Brand"}], live: null, shots: null, next: "kurta-pyjama-ca" },
+      overview: ["The Funky Fitz is a Delhi streetwear brand selling oversized tees, hoodies, sweatshirts, joggers and couple sets across India. I first built their Shopify store in 2024 and have designed their apparel graphics and ad creatives along the way.",
+        "In 2026 I rebuilt the whole store from scratch on a new theme: a strict black and white look, a homepage where the clothes hang on a rail, and product pages that answer every sizing and delivery question."],
+      challenge: ["The brand wanted a store as loud as its prints, something people remember and share, while still feeling fast on a phone and keeping cash on delivery working smoothly at checkout.",
+        "Fit was the other big problem. Oversized clothing confuses people, so shoppers needed real measurements for every size before they could buy with confidence."],
+      approach: ["I designed the new homepage around a clothes rail: real garments hang from hooks on a moving rail, and you can hover a piece and click to look closer. It leads into a Pick your fit grid, the latest drop, a couples section and an FAQ.",
+        "Every product page now shows the chest and length for each size right under the size buttons, an estimated delivery date with a PIN code check, and clear notes on cash on delivery, shipping and damage protection. I also rewrote all the product descriptions and set up the SEO.",
+        "Motion was tuned separately for iPhones so scrolling stays smooth on every phone, and the cash on delivery app was tested end to end before launch."],
+      services: ["Shopify", "Redesign", "Apparel design", "Ads"],
+      results: [{n:"171",l:"New product descriptions"},{n:"Mobile",l:"First"}], live: null, shots: null, next: "kurta-pyjama-ca" },
 
     "taneja-cloth-house": { name: "Taneja Cloth House", year: "2026", platform: "Shopify", mesh: "mesh-a",
       tagline: "A women's ethnic wear store migrated from ShopDeck to Shopify and redesigned in days.",
@@ -1044,6 +1086,7 @@
 
   /* ---- live URLs, screenshots, and next-chain ---- */
   const LIVE = {
+    "millionaire-fragrances": "https://millionairefragrance.com/",
     "fragfreak": "https://fragfreak.in/", "perfy-you": "https://perfyou.in/",
     "creative-inktales": "https://www.creativeinktales.com", "helping-life-foundation": "https://helpinglifefoundation.org",
     "poweroxx": "https://www.poweroxx.com",
@@ -1054,7 +1097,7 @@
     "trydent": "https://www.trydent.in",
     "taneja-cloth-house": "https://tanejaclothhouse.com/"
   };
-  const ORDER = ["taneja-cloth-house","fragfreak","perfy-you","creative-inktales","helping-life-foundation","poweroxx","the-funky-fitz","kurta-pyjama-ca","sundar-prem","owners-pride-healthcare","blackout-lifting-club","trydent"];
+  const ORDER = ["millionaire-fragrances","fragfreak","the-funky-fitz","taneja-cloth-house","perfy-you","creative-inktales","helping-life-foundation","poweroxx","kurta-pyjama-ca","sundar-prem","owners-pride-healthcare","blackout-lifting-club","trydent"];
   const NO_PM = new Set(["helping-life-foundation", "kurta-pyjama-ca", "sundar-prem"]);
   ORDER.forEach((slug, i) => {
     const p = PROJECTS[slug];
@@ -1076,7 +1119,7 @@
     PROJECTS["helping-life-foundation"].shots = [hb + "-1.jpg", hb + "-2.png", hb + "-3.png", hb + "-m.jpg", hb + "-m.jpg"];
   }
   // re-captured clean detail screenshots (homepage + real collection + product + mobile) as optimized .jpg
-  const JPG_SHOTS = ["fragfreak", "perfy-you", "creative-inktales", "poweroxx", "the-funky-fitz", "trydent", "owners-pride-healthcare", "blackout-lifting-club", "sundar-prem"];
+  const JPG_SHOTS = ["millionaire-fragrances", "fragfreak", "perfy-you", "creative-inktales", "poweroxx", "the-funky-fitz", "trydent", "owners-pride-healthcare", "blackout-lifting-club", "sundar-prem"];
   JPG_SHOTS.forEach((slug) => {
     if (!PROJECTS[slug]) return;
     const b = "assets/img/projects/" + slug;
@@ -1089,19 +1132,23 @@
 
   /* ---- per-card bento meta (industry + size), projects grid only ---- */
   const PMETA = {
+    "millionaire-fragrances": { ind: "beauty ecommerce", size: "feat" },
     "fragfreak": { ind: "beauty ecommerce", size: "feat" },
     "perfy-you": { ind: "fashion ecommerce" },
     "creative-inktales": { ind: "ecommerce" },
     "helping-life-foundation": { ind: "nonprofit", size: "wide" },
     "poweroxx": { ind: "fashion ecommerce" },
-    "the-funky-fitz": { ind: "fashion ecommerce" },
+    "the-funky-fitz": { ind: "fashion ecommerce", size: "feat" },
     "trydent": { ind: "ecommerce" },
     "kurta-pyjama-ca": { ind: "fashion ecommerce", size: "wide" },
     "owners-pride-healthcare": { ind: "healthcare" },
     "blackout-lifting-club": { ind: "fashion ecommerce" },
     "sundar-prem": { ind: "ecommerce" },
-    "taneja-cloth-house": { ind: "fashion ecommerce", size: "feat" }
+    "taneja-cloth-house": { ind: "fashion ecommerce" }
   };
+  // latest work: gets a "New" badge on every card and in the coverflow
+  const NEW_WORK = new Set(["millionaire-fragrances", "fragfreak", "the-funky-fitz"]);
+  const newBadge = () => { const b = document.createElement("span"); b.className = "proj-new"; b.textContent = "New"; return b; };
 
   /* ---- inject live screenshots + frame + view-cta into project cards ---- */
   function hydrateCards() {
@@ -1134,6 +1181,7 @@
       try { host = p.live ? new URL(p.live).host.replace(/^www\./, "") : ""; } catch (e) {}
       bar.innerHTML = "<i></i><i></i><i></i>" + (host ? `<b>${host}</b>` : "");
       vis.appendChild(bar);
+      if (NEW_WORK.has(slug)) vis.appendChild(newBadge());
       // headline result chip (projects bento only) — appears on hover
       if (grid && grid.classList.contains("bento") && p.results && p.results[0]) {
         const stat = document.createElement("span");
@@ -1216,7 +1264,7 @@
     const nx = PROJECTS[p.next];
     let prevSlug = null; for (const k in PROJECTS) { if (PROJECTS[k].next === slug) { prevSlug = k; break; } }
     const pv = prevSlug ? PROJECTS[prevSlug] : null;
-    const GLOW = { "fragfreak": "rgba(64,104,170,.4)", "perfy-you": "rgba(150,92,196,.4)", "creative-inktales": "rgba(198,84,62,.42)", "helping-life-foundation": "rgba(74,166,108,.4)", "poweroxx": "rgba(96,88,206,.4)", "the-funky-fitz": "rgba(214,128,52,.42)", "trydent": "rgba(150,132,84,.44)", "kurta-pyjama-ca": "rgba(150,110,80,.42)", "sundar-prem": "rgba(190,100,132,.4)", "owners-pride-healthcare": "rgba(80,162,150,.4)", "blackout-lifting-club": "rgba(126,116,128,.42)" };
+    const GLOW = { "millionaire-fragrances": "rgba(184,138,24,.4)", "fragfreak": "rgba(64,104,170,.4)", "perfy-you": "rgba(150,92,196,.4)", "creative-inktales": "rgba(198,84,62,.42)", "helping-life-foundation": "rgba(74,166,108,.4)", "poweroxx": "rgba(96,88,206,.4)", "the-funky-fitz": "rgba(214,128,52,.42)", "trydent": "rgba(150,132,84,.44)", "kurta-pyjama-ca": "rgba(150,110,80,.42)", "sundar-prem": "rgba(190,100,132,.4)", "owners-pride-healthcare": "rgba(80,162,150,.4)", "blackout-lifting-club": "rgba(126,116,128,.42)" };
     const glow = GLOW[slug] || "var(--glow)";
     const platTag = p.platform === "Shopify" ? "shopify" : "framer";
     const tags = p.services.map((s) => {
@@ -1224,7 +1272,7 @@
       return `<span class="${cls}">${s}</span>`;
     }).join("");
     let host = ""; try { host = p.live ? new URL(p.live).host.replace(/^www\./, "") : ""; } catch (e) {}
-    const FULL = { "fragfreak": "fragfreak-full.jpg", "perfy-you": "perfy-you-full.jpg", "trydent": "trydent-full.jpg" };
+    const FULL = { "millionaire-fragrances": "millionaire-fragrances-full.jpg", "fragfreak": "fragfreak-full.jpg", "perfy-you": "perfy-you-full.jpg", "trydent": "trydent-full.jpg" };
     const isLive = !!FULL[slug];
     const heroInner = isLive
       ? `<img class="pd-live" src="assets/img/projects/${FULL[slug]}" alt="${p.name} website" loading="eager" decoding="async">`
@@ -1554,6 +1602,7 @@
 
   function init() {
     preloader();   // start the loader first so it can animate on a clear main thread
+    try { smoothScroll(); } catch (e) {}  // light; ready before the first wheel tick
     splitWords();  // light, and reveal() depends on it
     const pauseOffscreen = function () {
       if (!("IntersectionObserver" in window)) return;

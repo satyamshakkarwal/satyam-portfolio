@@ -11,3 +11,7 @@ desktop.ini
 assets/img/projects/_*.json
 _blank.html
 *.log
+
+# Personal Instagram content + notes — NEVER push these to the public repo
+/instagram/
+PROJECT-NOTES.md
