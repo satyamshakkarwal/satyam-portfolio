@@ -1622,7 +1622,13 @@
   /* ----------  FASTER NAVIGATION: warm the next page on intent  ---------- */
   function prefetchNav() {
     const seen = new Set();
-    const internal = (h) => h && !/^(https?:|mailto:|tel:|#|javascript:)/i.test(h) && /(\.html|\?p=)/.test(h);
+    // same-site page links only. Netlify "pretty URLs" rewrites projects.html -> /projects on the
+    // live site, so match by origin instead of by ".html" in the link text.
+    const internal = (h) => {
+      if (!h || /^(mailto:|tel:|#|javascript:)/i.test(h)) return false;
+      try { const u = new URL(h, location.href); return u.origin === location.origin && (u.pathname + u.search) !== (location.pathname + location.search); }
+      catch (e) { return false; }
+    };
     const warm = (h) => {
       if (!internal(h) || seen.has(h)) return; seen.add(h);
       const l = document.createElement("link"); l.rel = "prefetch"; l.as = "document"; l.href = h; document.head.appendChild(l);
@@ -1640,12 +1646,15 @@
     // On phones "moderate" only fires on the tap itself, so the eager prefetch is what removes the wait.
     try {
       if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
-        const MAIN = ["index.html", "projects.html", "about.html", "contact.html"];
+        // the menu's real link addresses (whatever form the host serves them in)
+        const MAIN = Array.from(new Set($$(".nav-links a[href], .mm-links a[href]").map((a) => a.href.split("#")[0])))
+          .filter((h) => internal(h));
+        const pageLinks = { and: [{ href_matches: "/*" }, { not: { selector_matches: "[target=_blank], [download]" } }] };
         const sr = document.createElement("script");
         sr.type = "speculationrules";
         sr.textContent = JSON.stringify({
-          prefetch: [{ urls: MAIN, eagerness: "eager" }, { where: { href_matches: "/project.html*" }, eagerness: "moderate" }],
-          prerender: [{ urls: MAIN, eagerness: "moderate" }],
+          prefetch: [{ urls: MAIN, eagerness: "eager" }, { where: pageLinks, eagerness: "moderate" }],
+          prerender: [{ where: pageLinks, eagerness: "moderate" }],
         });
         document.body.appendChild(sr);
       }
