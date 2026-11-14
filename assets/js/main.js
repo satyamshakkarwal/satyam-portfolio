@@ -35,14 +35,18 @@
   function preloader() {
     const pre = $(".preloader");
     if (!pre) { document.body.classList.add("loaded"); document.dispatchEvent(new Event("app:loaded")); return; }
-    // reduced-motion users skip straight to the content
-    if (reduce) {
+    // reduced-motion users, and every page after the first one in a visit, skip straight to the
+    // content so moving between pages feels instant (the page transition does the motion instead)
+    if (reduce || root.classList.contains("pre-seen")) {
       document.body.classList.remove("no-scroll");
-      document.body.classList.add("loaded");
-      document.dispatchEvent(new Event("app:loaded"));
+      const show = () => { document.body.classList.add("loaded"); document.dispatchEvent(new Event("app:loaded")); };
+      // a prerendered page waits until it is actually shown, so its hero entrance is seen
+      if (document.prerendering) document.addEventListener("prerenderingchange", show, { once: true });
+      else show();
       pre.remove();
       return;
     }
+    try { sessionStorage.setItem("satyam-pre", "1"); } catch (e) {}
     const word = (pre.dataset.word || "WELCOME").toUpperCase();
     const chars = word.split("").map((c) => `<span>${c}</span>`).join("");
     const verbs = PRE_VERBS.map((v) => `<span>${v}</span>`).join("");
@@ -100,16 +104,30 @@
     if (window.matchMedia("(hover: none)").matches || window.innerWidth < 820) return;
     const dot = $(".cursor-dot"), ring = $(".cursor-ring");
     if (!dot || !ring) return;
-    let mx = 0, my = 0, rx = 0, ry = 0;
+    // start where the mouse was on the previous page, so the cursor doesn't jump in from the corner
+    let mx = 0, my = 0, rx = 0, ry = 0, running = false;
+    const restore = () => {
+      try { const s = JSON.parse(sessionStorage.getItem("satyam-cur") || "null"); if (s) { mx = rx = s[0]; my = ry = s[1]; } } catch (e) {}
+      dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+    };
+    restore();
+    if (document.prerendering) document.addEventListener("prerenderingchange", restore, { once: true });
+    const remember = () => { try { sessionStorage.setItem("satyam-cur", JSON.stringify([mx, my])); } catch (e) {} };
+    window.addEventListener("pointerdown", remember, { passive: true });
+    // the ring eases toward the mouse and the loop stops once it has caught up (no idle CPU)
+    const loop = () => {
+      rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
+      if (Math.abs(mx - rx) + Math.abs(my - ry) < 0.3) { rx = mx; ry = my; running = false; }
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+      if (running) requestAnimationFrame(loop);
+    };
     window.addEventListener("mousemove", (e) => {
       mx = e.clientX; my = e.clientY;
       dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
-    });
-    (function loop() {
-      rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
-      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
-      requestAnimationFrame(loop);
-    })();
+      if (!running) { running = true; requestAnimationFrame(loop); }
+    }, { passive: true });
+    window.addEventListener("pagehide", remember);
     const label = document.createElement("span");
     label.className = "cur-label"; ring.appendChild(label);
     document.addEventListener("mouseover", (e) => {
