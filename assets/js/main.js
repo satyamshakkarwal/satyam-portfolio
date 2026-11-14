@@ -1635,15 +1635,41 @@
       a.addEventListener("pointerenter", go, { passive: true });
       a.addEventListener("touchstart", go, { passive: true });
     });
-    // Chromium: prerender the main pages on hover/press intent -> navigation is instant
+    // Chromium: fetch the 4 main pages in the background as soon as this one is up (small HTML only),
+    // prefetch project pages for links near the screen, and prerender on hover/press intent.
+    // On phones "moderate" only fires on the tap itself, so the eager prefetch is what removes the wait.
     try {
       if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
+        const MAIN = ["index.html", "projects.html", "about.html", "contact.html"];
         const sr = document.createElement("script");
         sr.type = "speculationrules";
-        sr.textContent = JSON.stringify({ prerender: [{ urls: ["index.html", "projects.html", "about.html", "contact.html"], eagerness: "moderate" }] });
+        sr.textContent = JSON.stringify({
+          prefetch: [{ urls: MAIN, eagerness: "eager" }, { where: { href_matches: "/project.html*" }, eagerness: "moderate" }],
+          prerender: [{ urls: MAIN, eagerness: "moderate" }],
+        });
         document.body.appendChild(sr);
       }
     } catch (e) {}
+  }
+
+  /* ----------  INSTANT TAP FEEDBACK BEFORE A PAGE CHANGE  ---------- */
+  function pageLeave() {
+    const veil = document.createElement("div"); veil.className = "page-veil"; veil.setAttribute("aria-hidden", "true");
+    const bar = document.createElement("div"); bar.className = "page-bar"; bar.setAttribute("aria-hidden", "true");
+    document.body.append(veil, bar);
+    let undo = null;
+    document.addEventListener("click", (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest("a[href]");
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      let url; try { url = new URL(a.href, location.href); } catch (x) { return; }
+      if (url.origin !== location.origin || !/^https?:$/.test(url.protocol)) return;
+      if (url.pathname === location.pathname && url.search === location.search) return;   // same page / #hash
+      root.classList.add("is-leaving");
+      clearTimeout(undo); undo = setTimeout(() => root.classList.remove("is-leaving"), 8000);   // safety if the load is cancelled
+    });
+    // coming back with the back button restores this page from memory: clear the dim
+    window.addEventListener("pageshow", (e) => { if (e.persisted) { clearTimeout(undo); root.classList.remove("is-leaving"); } });
   }
 
   function init() {
@@ -1662,7 +1688,7 @@
     // work per frame and yield, so the loader (and everything else) stays smooth.
     const tasks = [
       reveal, nav, year, contactForm, seo, projectDetail, cursor, magnetic,
-      marquee, lazyMedia, prefetchNav, curvedLogos, counters, skillBars,
+      marquee, lazyMedia, prefetchNav, pageLeave, curvedLogos, counters, skillBars,
       scrollFx, parallax, heroSpot, rotateWord, heroShow, hydrateCards, filters,
       tilt3d, collage, aboutFX, cards3d, workCarousel, converge, processDial, deliverScroll,
       scrollWild, pauseOffscreen, coverflow, spine,

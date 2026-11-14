@@ -1,0 +1,12 @@
+# Netlify response headers.
+# CSS and JS are always linked with a ?v= number that changes on every update,
+# so browsers can keep them for a year and never re-check them between pages.
+/assets/css/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images keep their file names when replaced, so cache them for a day only,
+# and let the browser show the cached copy while it checks for a newer one.
+/assets/img/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
