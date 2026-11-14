@@ -273,12 +273,40 @@
     });
   }
 
+  /* ----------  HOME "SELECTED WORK" SWIPE CAROUSEL (phones; layout is pure CSS)  ---------- */
+  function workCarousel() {
+    const grid = $("#work .proj-grid");
+    if (!grid) return;
+    const cards = $$(".proj-card", grid);
+    if (cards.length < 2) return;
+    const nav = document.createElement("div");
+    nav.className = "pg-nav";
+    nav.innerHTML = `<span class="pg-count"><b>1</b> / ${cards.length}</span><span class="pg-dots">${cards.map((c, i) => `<button type="button" aria-label="Show project ${i + 1}"${i ? "" : ' class="on"'}></button>`).join("")}</span><span class="pg-hint">Swipe</span>`;
+    grid.after(nav);
+    const dots = $$(".pg-dots button", nav), num = $(".pg-count b", nav);
+    let cur = 0, ticking = false;
+    const update = () => {
+      ticking = false;
+      const step = cards[0].offsetWidth + 14;   // card width + gap
+      const i = Math.max(0, Math.min(cards.length - 1, Math.round(grid.scrollLeft / step)));
+      if (grid.scrollLeft > 8) nav.classList.add("used");
+      if (i === cur) return;
+      dots[cur].classList.remove("on"); dots[i].classList.add("on"); num.textContent = i + 1; cur = i;
+    };
+    grid.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    // card i sits centred at scrollLeft = i * step (equal widths, centred snap)
+    dots.forEach((d, i) => d.addEventListener("click", () => {
+      grid.scrollTo({ left: i * (cards[0].offsetWidth + 14), behavior: reduce ? "auto" : "smooth" });
+    }));
+  }
+
   /* ----------  3D SCROLL-REVEAL CARDS (home featured)  ---------- */
   function cards3d() {
     const cards = $$(".proj-card.card3d");
     if (!cards.length) return;
-    if (reduce) { cards.forEach((c) => { c.style.opacity = "1"; c.style.transform = ""; c.classList.add("is-set"); }); return; }
     const small = window.innerWidth < 760;
+    // phones show these cards in a swipe carousel (see workCarousel), so no scroll-driven rise there
+    if (reduce || small) { cards.forEach((c) => { c.style.opacity = "1"; c.style.transform = ""; c.classList.add("is-set"); }); return; }
     const active = new Set();
     cards.forEach((c, i) => { c._col = (i % 2 === 0) ? -1 : 1; c._i = i; c.style.opacity = "0"; });
     // cache each card's document-Y (offsetTop chain ignores our own transform) so the scroll
@@ -1636,7 +1664,7 @@
       reveal, nav, year, contactForm, seo, projectDetail, cursor, magnetic,
       marquee, lazyMedia, prefetchNav, curvedLogos, counters, skillBars,
       scrollFx, parallax, heroSpot, rotateWord, heroShow, hydrateCards, filters,
-      tilt3d, collage, aboutFX, cards3d, converge, processDial, deliverScroll,
+      tilt3d, collage, aboutFX, cards3d, workCarousel, converge, processDial, deliverScroll,
       scrollWild, pauseOffscreen, coverflow, spine,
     ];
     let i = 0;
