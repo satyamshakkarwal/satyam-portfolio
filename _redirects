@@ -1,0 +1,11 @@
+# v2 is a single page with rooms. Old page links land in the right spot.
+/project.html  p=:p  /?p=:p  301!
+/project       p=:p  /?p=:p  301!
+/project.html        /#doors 301!
+/project             /#doors 301!
+/projects.html       /#doors 301!
+/projects            /#doors 301!
+/about.html          /#story 301!
+/about               /#story 301!
+/contact.html        /#contact 301!
+/contact             /#contact 301!
