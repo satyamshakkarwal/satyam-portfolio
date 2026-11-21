@@ -119,8 +119,8 @@ h1, h2, h3, h4, .display {
 @keyframes vt-in { from { opacity: 0; transform: translateY(26px); } }
 /* phones: a shorter move feels snappier */
 @media (max-width: 760px) {
-  ::view-transition-old(root) { animation-duration: .3s; }
-  ::view-transition-new(root) { animation-duration: .42s; }
+  ::view-transition-old(root) { animation-duration: .22s; }
+  ::view-transition-new(root) { animation-duration: .32s; animation-delay: 0s; }
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }

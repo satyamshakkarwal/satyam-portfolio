@@ -16,3 +16,27 @@
 # and let the browser show the cached copy while it checks for a newer one.
 /assets/img/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# Pages: a phone may reuse a page it fetched in the last 5 minutes (each page fetches
+# the main pages once idle, and again when the menu opens), then it checks again. One by one on purpose:
+# a catch-all /* rule would also match the asset rules above and merge two Cache-Control values.
+/
+  Cache-Control: public, max-age=300, must-revalidate
+/index.html
+  Cache-Control: public, max-age=300, must-revalidate
+/about
+  Cache-Control: public, max-age=300, must-revalidate
+/about.html
+  Cache-Control: public, max-age=300, must-revalidate
+/projects
+  Cache-Control: public, max-age=300, must-revalidate
+/projects.html
+  Cache-Control: public, max-age=300, must-revalidate
+/contact
+  Cache-Control: public, max-age=300, must-revalidate
+/contact.html
+  Cache-Control: public, max-age=300, must-revalidate
+/project
+  Cache-Control: public, max-age=300, must-revalidate
+/project.html
+  Cache-Control: public, max-age=300, must-revalidate

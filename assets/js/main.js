@@ -704,13 +704,44 @@
   }
 
   /* ----------  NAV: scroll state + active link  ---------- */
+  /* opening the phone menu means a page switch is coming: get the main pages ready right away.
+     Chrome/Edge fully prepare them in the background (the tap then shows them instantly);
+     Safari and Firefox have no background preparing, so they fetch the pages into the cache,
+     which the 5-minute page caching in _headers lets the next tap reuse (no network wait). */
+  let warmedMain = false, warmedAt = 0;
+  // Safari reports support for speculation rules but does not prerender with them, so test for
+  // document.prerendering too: only Chromium has both, and only Chromium really prerenders.
+  const canPrerender = (() => { try { return "prerendering" in document && !!(HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")); } catch (e) { return false; } })();
+  function warmMain() {
+    // compare page paths, so "/", "/index" and "index.html" all count as this page
+    const norm = (p) => p.replace(/index(\.html)?$/, "").replace(/\.html$/, "");
+    const here = norm(location.pathname);
+    const urls = Array.from(new Set($$(".nav-links a[href], .mobile-menu a[href]").map((a) => a.href.split("#")[0])))
+      .filter((h) => { try { const u = new URL(h); return u.origin === location.origin && norm(u.pathname) !== here; } catch (e) { return false; } });
+    if (!urls.length) return;
+    try {
+      if (canPrerender) {
+        if (warmedMain) return; warmedMain = true;
+        const s = document.createElement("script"); s.type = "speculationrules";
+        s.textContent = JSON.stringify({ prerender: [{ urls, eagerness: "eager" }] });
+        document.body.appendChild(s);
+        return;
+      }
+    } catch (e) {}
+    if (Date.now() - warmedAt < 60000) return;   // fetched within the last minute: still fresh
+    warmedAt = Date.now();
+    urls.forEach((h) => { try { fetch(h, { credentials: "same-origin" }).catch(() => {}); } catch (e) {} });
+  }
+
   function nav() {
     const burger = $(".burger"), menu = $(".mobile-menu");
     if (burger && menu) {
+      burger.addEventListener("touchstart", warmMain, { passive: true, once: true });
       burger.addEventListener("click", () => {
         const open = burger.classList.toggle("open");
         menu.classList.toggle("open", open);
         document.body.classList.toggle("no-scroll", open);
+        if (open) warmMain();
       });
       $$("a", menu).forEach((a) => a.addEventListener("click", () => {
         burger.classList.remove("open"); menu.classList.remove("open");
@@ -1657,6 +1688,14 @@
           prerender: [{ where: pageLinks, eagerness: "moderate" }],
         });
         document.body.appendChild(sr);
+      }
+    } catch (e) {}
+    // Safari/Firefox: no background preloading at all, so once this page has finished loading and gone
+    // quiet, fetch the main pages (about 20 KB each). A tap in the next few minutes then opens from cache.
+    try {
+      if (!canPrerender) {
+        const later =() => setTimeout(() => (window.requestIdleCallback || ((f) => f()))(warmMain), 1500);
+        if (document.readyState === "complete") later(); else addEventListener("load", later, { once: true });
       }
     } catch (e) {}
   }
