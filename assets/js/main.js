@@ -6,6 +6,25 @@
   const $  = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // scroll-driven CSS animations run on the compositor (no script per scroll frame); older browsers keep the JS versions
+  const SDA = (() => { try { return CSS.supports("animation-timeline: view()") && CSS.supports("animation-range: cover 10%"); } catch (e) { return false; } })();
+  // ONE scroll position per frame, shared by every scroll effect. Each effect used to read window.scrollY /
+  // innerHeight / getBoundingClientRect inside its own rAF after others had written styles, which forced
+  // 2-3 extra style recalcs per frame (measured). SY is set by the scroll event (style is clean there) and,
+  // when Lenis drives the scroll, straight from Lenis in the same frame (see smoothScroll).
+  let SY = window.scrollY, VH = window.innerHeight, VW = window.innerWidth;
+  let lenisOn = false;   // when Lenis drives the scroll it reports SY itself (reading scrollY here forced a style recalc)
+  window.addEventListener("scroll", () => { if (!lenisOn) SY = window.scrollY; }, { passive: true });
+  window.addEventListener("resize", () => { VH = window.innerHeight; VW = window.innerWidth; SY = window.scrollY; }, { passive: true });
+  const pageTop = (el) => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };   // ignores transforms
+  // measurers re-run when the page size changes (fonts, images, resize), never per frame
+  const geoFns = [];
+  let geoT = null;
+  const geoAll = () => { clearTimeout(geoT); geoT = setTimeout(() => geoFns.forEach((f) => { try { f(); } catch (e) {} }), 120); };
+  const onGeo = (fn) => { geoFns.push(fn); fn(); };
+  window.addEventListener("load", geoAll);
+  window.addEventListener("resize", geoAll, { passive: true });
+  if ("ResizeObserver" in window) new ResizeObserver(geoAll).observe(document.body);
 
   /* ----------  THEME (persist across pages)  ---------- */
   // dark by default for everyone; only a real tap on the toggle is remembered (new key, because the old
@@ -210,25 +229,39 @@
     });
     const MAXA = 44, DEPTH = 165, POP = 80;
     let running = false, raf = null, tickSkip = false;
+    // Reading getBoundingClientRect() every frame forced a full style recalc each time (measured). Instead,
+    // measure once, then place the moving track from its CSS animation clock: getComputedTiming() is free.
+    let cx = 0, half = 1;
+    function measure() {
+      const mr = marq.getBoundingClientRect();
+      cx = mr.left + mr.width / 2; half = (mr.width / 2) || 1;
+      groups.forEach((g) => {
+        g.anim = (g.tr.getAnimations ? g.tr.getAnimations() : []).find((a) => a.effect && a.effect.getComputedTiming) || null;
+        g.w = g.tr.offsetWidth;                                  // the keyframes move the track by -50% of its own width
+        const prog = g.anim ? (g.anim.effect.getComputedTiming().progress || 0) : 0;
+        g.base = g.tr.getBoundingClientRect().left + prog * g.w * 0.5;   // left edge with no animation applied
+      });
+    }
     function frame() {
-      // update tile curve every other frame (~30fps) — halves the per-frame cost, imperceptible on a slow marquee
+      // update tile curve every other frame (~30fps): halves the per-frame cost, imperceptible on a slow marquee
       tickSkip = !tickSkip;
       if (tickSkip) { raf = requestAnimationFrame(frame); return; }
-      const mr = marq.getBoundingClientRect();
-      const cx = mr.left + mr.width / 2;
-      const half = (mr.width / 2) || 1;
       for (const g of groups) {
-        const trLeft = g.tr.getBoundingClientRect().left;
+        const prog = g.anim ? (g.anim.effect.getComputedTiming().progress || 0) : 0;
+        const trLeft = g.base - prog * g.w * 0.5;
         for (const c of g.cells) {
           let n = (trLeft + c.rel - cx) / half;
           if (n < -1.25) n = -1.25; else if (n > 1.25) n = 1.25;
           const ry = -n * MAXA;
           const tz = -Math.abs(n) * DEPTH + (c.el === hovered ? POP : 0);
-          c.el.style.transform = "translateZ(" + tz.toFixed(1) + "px) rotateY(" + ry.toFixed(1) + "deg)";
+          const t = "translateZ(" + tz.toFixed(1) + "px) rotateY(" + ry.toFixed(1) + "deg)";
+          if (c.t !== t) { c.t = t; c.el.style.transform = t; }   // tiles parked at the edges stop re-writing
         }
       }
       raf = requestAnimationFrame(frame);
     }
+    measure();
+    window.addEventListener("resize", () => { groups.forEach((g) => g.cells.forEach((c) => { c.el.style.transform = ""; c.t = ""; })); measure(); }, { passive: true });
     function start() { if (!running) { running = true; frame(); } }
     function stop() { if (running) { running = false; cancelAnimationFrame(raf); } }
     if ("IntersectionObserver" in window) {
@@ -309,6 +342,8 @@
     const small = window.innerWidth < 760;
     // phones show these cards in a swipe carousel (see workCarousel), so no scroll-driven rise there
     if (reduce || small) { cards.forEach((c) => { c.style.opacity = "1"; c.style.transform = ""; c.classList.add("is-set"); }); return; }
+    // the rise is a CSS scroll-driven animation (style.css "card3dIn"); nothing to do per frame
+    if (SDA) { cards.forEach((c) => { c.style.opacity = ""; c.style.transform = ""; c.classList.add("is-set"); }); return; }
     const active = new Set();
     cards.forEach((c, i) => { c._col = (i % 2 === 0) ? -1 : 1; c._i = i; c.style.opacity = "0"; });
     // cache each card's document-Y (offsetTop chain ignores our own transform) so the scroll
@@ -424,10 +459,11 @@
     }
     const flat = () => reduce;
     let mode = null, targetP = 0, curP = 0, running = false;
+    let cfTop = 0, cfH = 0;
+    onGeo(() => { cfTop = pageTop(section); cfH = section.offsetHeight; });
     function computeTarget() {
-      const r = section.getBoundingClientRect();
-      const scrollable = section.offsetHeight - window.innerHeight;
-      return scrollable > 0 ? Math.max(0, Math.min(1, -r.top / scrollable)) : 0;
+      const scrollable = cfH - VH;
+      return scrollable > 0 ? Math.max(0, Math.min(1, (SY - cfTop) / scrollable)) : 0;
     }
     function render() {
       targetP = computeTarget();                 // read scroll geometry inside the frame (not per scroll event)
@@ -569,10 +605,10 @@
     }
 
     function computeTarget() {
-      isOn = scrollY > 30;
+      isOn = SY > 30;
       // anchor the tip to what the viewer is looking at (so it never drifts away on long sections):
       // binary-search the path samples by page-Y for the point at ~70% of the viewport
-      const anchor = Math.max(samples[0].y, Math.min(samples[SN].y, scrollY + window.innerHeight * 0.7));
+      const anchor = Math.max(samples[0].y, Math.min(samples[SN].y, SY + VH * 0.7));
       let lo = 0, hi = SN;
       while (lo < hi) { const mid = (lo + hi) >> 1; if (samples[mid].y < anchor) lo = mid + 1; else hi = mid; }
       const i0 = Math.max(0, lo - 1);
@@ -776,6 +812,7 @@
         prevent: (node) => !!(node.classList && node.classList.contains("mobile-menu")),
       });
     } catch (e) { lenis = null; return; }
+    try { lenis.on("scroll", (l) => { if (typeof l.animatedScroll === "number") SY = l.animatedScroll; }); lenisOn = true; } catch (e) {}
     // the preloader and the mobile menu lock the page with body.no-scroll; keep Lenis in step
     const sync = () => { if (document.body.classList.contains("no-scroll")) lenis.stop(); else lenis.start(); };
     sync();
@@ -796,15 +833,14 @@
     const measure = () => { const h = document.documentElement; maxScroll = (h.scrollHeight - h.clientHeight) || 1; };
     const frame = () => {
       ticking = false;
-      const y = window.scrollY || window.pageYOffset || 0;
-      if (prog) prog.style.width = ((y / maxScroll) * 100) + "%";
+      const y = SY;
+      if (prog) prog.style.transform = "scaleX(" + Math.min(1, Math.max(0, y / maxScroll)).toFixed(4) + ")";
       if (top) top.classList.toggle("show", y > 600);
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
-    measure();
+    onGeo(measure);
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", () => { measure(); onScroll(); }, { passive: true });
-    window.addEventListener("load", measure);
+    window.addEventListener("resize", onScroll, { passive: true });
     frame();
     if (top) top.addEventListener("click", () => scrollToY(0, 1.4));
   }
@@ -847,9 +883,11 @@
     skewEls.forEach((el) => { el.style.willChange = "transform"; });
     const paraEls = $$(".sec-head, .logos-head"); // heading blocks drift for depth (compose with child reveals)
     const heroEl = $(".hero"), heroShow = $(".hero-show"), heroCopy = $(".hero-copy");
-    let lastY = window.scrollY, vel = 0, raf = null, idle = 0, reset = false;
+    let paraTop = [], paraH = [], heroH = 0;
+    onGeo(() => { paraTop = paraEls.map(pageTop); paraH = paraEls.map((el) => el.offsetHeight); heroH = heroEl ? heroEl.offsetHeight : 0; });
+    let lastY = SY, vel = 0, raf = null, idle = 0, reset = false;
     function loop() {
-      const y = window.scrollY;
+      const y = SY;
       if (reset) { lastY = y; reset = false; }   // avoid a velocity spike when the loop restarts
       const dv = y - lastY; lastY = y;
       vel += (dv - vel) * 0.2;
@@ -857,17 +895,17 @@
       const skewDeg = (v / 58) * 5.2;                 // lean (skewY only — scaleY removed, it forced full-section re-raster = jank)
       const sk = "skewY(" + skewDeg.toFixed(2) + "deg)";
       for (let i = 0; i < skewEls.length; i++) skewEls[i].style.transform = sk;
-      const vh = window.innerHeight;
+      const vh = VH;
       for (let i = 0; i < paraEls.length; i++) {
-        const el = paraEls[i], r = el.getBoundingClientRect();
-        if (r.bottom > -80 && r.top < vh + 80) {
-          const off = ((r.top + r.height / 2) - vh / 2) / vh;
-          el.style.transform = "translateY(" + (off * -56).toFixed(1) + "px)";
+        const top = paraTop[i] - y, h = paraH[i];
+        if (top + h > -80 && top < vh + 80) {
+          const off = ((top + h / 2) - vh / 2) / vh;
+          paraEls[i].style.transform = "translateY(" + (off * -56).toFixed(1) + "px)";
         }
       }
       // cinematic hero scroll-exit: cards zoom/fade away + copy lifts as you leave the hero
-      if (heroEl && y < heroEl.offsetHeight) {
-        const hp = Math.max(0, Math.min(1, y / (heroEl.offsetHeight * 0.82)));
+      if (heroEl && y < heroH) {
+        const hp = Math.max(0, Math.min(1, y / (heroH * 0.82)));
         if (heroShow) { heroShow.style.transform = "translateY(" + (hp * -64).toFixed(1) + "px) scale(" + (1 - hp * 0.18).toFixed(3) + ")"; heroShow.style.opacity = (1 - hp * 0.95).toFixed(2); }
         if (heroCopy) { heroCopy.style.transform = "translateY(" + (hp * 46).toFixed(1) + "px)"; heroCopy.style.opacity = (1 - hp * 0.75).toFixed(2); }
       }
@@ -900,13 +938,14 @@
         return { row, shift: Math.max(0, row.scrollWidth / 2), baseLeft: rl, cells };
       });
     };
+    let dTop = 0, dH = 0;
+    onGeo(() => { dTop = pageTop(sec); dH = sec.offsetHeight; });
     function loop() {
       raf = null;
-      const r = sec.getBoundingClientRect();
-      const total = sec.offsetHeight - window.innerHeight || 1;
-      let p = (-r.top) / total; p = p < 0 ? 0 : p > 1 ? 1 : p;
+      const total = dH - VH || 1;
+      let p = (SY - dTop) / total; p = p < 0 ? 0 : p > 1 ? 1 : p;
       if (progBar) progBar.style.transform = "scaleX(" + p.toFixed(3) + ")";
-      const cx = window.innerWidth / 2, reach = window.innerWidth * 0.55;
+      const cx = VW / 2;
       for (let i = 0; i < data.length; i++) {
         const d = data[i];
         const x = (i % 2 === 0) ? -p * d.shift : -(1 - p) * d.shift;
@@ -1516,6 +1555,7 @@
     if (!sec) return;
     const L = $(".cv-l", sec), R = $(".cv-r", sec), mid = $(".cv-mid", sec);
     if (reduce) { if (mid) { mid.style.transform = "none"; mid.style.opacity = "1"; } return; }
+    if (SDA) return;   // CSS scroll-driven animation (style.css "cvL/cvR/cvMid")
     let raf = null, vis = false;
     const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
     function frame() {
@@ -1565,9 +1605,15 @@
     setR();
     if (reduce) { items.forEach((it) => it.classList.add("is-on")); return; }
     let target = 0, cur = 0, raf = null, vis = false, active = -1;
+    // section top/height measured on load/resize only (reading them every frame forced a style recalc)
+    let secTop = 0, secH = 0;
+    const geo = () => { let y = 0; for (let n = sec; n; n = n.offsetParent) y += n.offsetTop; secTop = y; secH = sec.offsetHeight; };
+    geo();
+    window.addEventListener("load", geo);
+    if ("ResizeObserver" in window) new ResizeObserver(geo).observe(document.body);
     function compute() {
-      const total = sec.offsetHeight - window.innerHeight;
-      const p = total > 0 ? Math.min(1, Math.max(0, -sec.getBoundingClientRect().top / total)) : 0;
+      const total = secH - VH;
+      const p = total > 0 ? Math.min(1, Math.max(0, (SY - secTop) / total)) : 0;
       target = p * (N - 1);
     }
     function loop() {
@@ -1743,7 +1789,8 @@
     splitWords();  // light, and reveal() depends on it
     const pauseOffscreen = function () {
       if (!("IntersectionObserver" in window)) return;
-      [[$(".hero"), $(".hero")], [$(".cta-band"), $(".cta-band")]].forEach(([watch, target]) => {
+      const stats = $(".statx-num"), statSec = stats ? stats.closest("section") : null;
+      [[$(".hero"), $(".hero")], [$(".cta-band"), $(".cta-band")], [statSec, statSec]].forEach(([watch, target]) => {
         if (!watch || !target) return;
         new IntersectionObserver((es) => { target.classList.toggle("is-paused", !es[0].isIntersecting); }, { rootMargin: "80px" }).observe(watch);
       });

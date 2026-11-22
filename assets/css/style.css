@@ -304,11 +304,12 @@ html.is-leaving .page-bar { opacity: 1; animation: pageBar 2.4s cubic-bezier(.08
   font-family: "Space Grotesk", sans-serif; font-weight: 600;
   font-size: 1.05rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: .5rem;
 }
-.brand .dot {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: var(--accent); box-shadow: 0 0 0 4px var(--glow);
-  animation: pulse 2.4s infinite;
-}
+.brand .dot { position: relative; width: 9px; height: 9px; border-radius: 50%; }
+/* dot + pulsing ring drawn as two layers so the pulse is transform/opacity only (a box-shadow loop repainted the nav every frame) */
+.brand .dot::before, .brand .dot::after, .avail .live::before, .avail .live::after { content: ""; position: absolute; border-radius: 50%; }
+.brand .dot::before { inset: 0; z-index: 1; background: var(--accent); }
+.brand .dot::after { inset: -4px; background: var(--glow); animation: dotRing 2.4s infinite; }
+@keyframes dotRing { 50% { transform: scale(1.47); opacity: 0; } }
 @keyframes pulse { 50% { box-shadow: 0 0 0 8px transparent; } }
 .nav-links { display: flex; align-items: center; gap: .35rem; }
 .nav-links a {
@@ -760,6 +761,7 @@ body.loaded .hero-bloom { animation: heroBloom 2s cubic-bezier(.16,1,.3,1) both;
   animation: heroShimmer 6s ease-in-out infinite;
 }
 @keyframes heroShimmer { 0%,100% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
+.hero.is-paused h1 .grad, .is-paused .statx-num { animation-play-state: paused; }
 /* kinetic headline: every word rises out of its own mask, one after another (delays inline as --d);
    the gradient line rises as one piece so its colour stays continuous */
 .hero h1 { position: relative; }
@@ -805,7 +807,10 @@ body.loaded .hero-bloom { animation: heroBloom 2s cubic-bezier(.16,1,.3,1) both;
   display: inline-flex; align-items: center; gap: .55rem;
   font-size: .85rem; font-weight: 500; color: var(--text-2);
 }
-.avail .live { width: 8px; height: 8px; border-radius: 50%; background: #2ecc71; box-shadow: 0 0 0 4px rgba(46,204,113,.18); animation: pulse 2s infinite; }
+.avail .live { position: relative; width: 8px; height: 8px; border-radius: 50%; }
+.avail .live::before { inset: 0; z-index: 1; background: #2ecc71; }
+.avail .live::after { inset: -4px; background: rgba(46,204,113,.18); animation: liveRing 2s infinite; }
+@keyframes liveRing { 50% { transform: scale(1.5); opacity: 0; } }
 
 /* ----------  STATS STRIP  ---------- */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border);
@@ -1092,7 +1097,6 @@ body.loaded .hero-bloom { animation: heroBloom 2s cubic-bezier(.16,1,.3,1) both;
     linear-gradient(135deg, #2a1c14 0%, #17100a 58%, #120b06 100%);
   color: #fff; border: 1px solid rgba(255,200,140,.14);
   box-shadow: 0 30px 80px -34px rgba(226,84,31,.45), inset 0 1px 0 rgba(255,255,255,.06);
-  animation: ctaGlow 6s ease-in-out infinite;
 }
 [data-theme="dark"] .cta-band {
   background:
@@ -1232,8 +1236,8 @@ body.loaded .hero-bloom { animation: heroBloom 2s cubic-bezier(.16,1,.3,1) both;
 .reveal-words.in .word:nth-child(8) > span { transition-delay: .42s; }
 
 /* scroll progress bar */
-.scroll-prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 850;
-  background: linear-gradient(90deg, var(--accent-2), var(--accent)); transition: width .1s linear; }
+.scroll-prog { position: fixed; top: 0; left: 0; height: 3px; width: 100%; z-index: 850; transform: scaleX(0); transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
 
 /* to-top */
 .to-top { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 700; width: 50px; height: 50px;
@@ -1929,3 +1933,32 @@ body { position: relative; }
 [data-theme="dark"] .page-spine .sp-glow { opacity: .22; }
 @media (max-width: 900px) { .page-spine { display: none; } }
 @media (prefers-reduced-motion: reduce) { .page-spine { display: none; } }
+
+
+/* ===== SCROLL-DRIVEN REVEALS (compositor) =====
+   Where the browser supports scroll-driven animations, the 3D card rise (home "Selected work") and the
+   converge cards ("Pixel-perfect execution") run here instead of in JS every scroll frame.
+   Ranges mirror the old JS: cards rise while their top moves from 94% to 42% of the viewport;
+   converge runs across the pinned section (contain 0% to 100%). main.js skips its JS when SDA is true. */
+@keyframes card3dIn { from { opacity: .1; transform: translate3d(0, 70px, -260px) rotateX(22deg) rotateY(var(--c3-ry, -12deg)) scale(.9); } }
+@keyframes cvL { from { transform: translate(-50%,-50%) translateX(calc(-50vw - var(--cvw) - 60px)) rotate(-6deg) scale(.88); } to { transform: translate(-50%,-50%) translateX(calc(-50vw + var(--cvw) / 2 + 18px)) rotate(0deg) scale(1); } }
+@keyframes cvR { from { transform: translate(-50%,-50%) translateX(calc(50vw + var(--cvw) + 60px)) rotate(6deg) scale(.88); } to { transform: translate(-50%,-50%) translateX(calc(50vw - var(--cvw) / 2 - 18px)) rotate(0deg) scale(1); } }
+@keyframes cvMid { from { transform: translate(-50%,-50%) scale(.82); opacity: .4; } to { transform: translate(-50%,-50%) scale(1.02); opacity: 1; } }
+@supports (animation-timeline: view()) and (animation-range: cover 10%) {
+  @media (min-width: 760px) and (prefers-reduced-motion: no-preference) {
+    .proj-card.card3d {
+      animation-name: card3dIn; animation-duration: auto; animation-timing-function: cubic-bezier(.33,1,.68,1);
+      animation-fill-mode: backwards; animation-timeline: view(); animation-range: cover 6vh cover 58vh;
+    }
+    .proj-card.card3d:nth-child(even) { --c3-ry: 12deg; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cv-sec { view-timeline-name: --cv; }
+    .cv-card { --cvw: clamp(230px, 23vw, 330px); }
+    .cv-l, .cv-r, .cv-mid {
+      animation-duration: auto; animation-timing-function: cubic-bezier(.45,0,.55,1); animation-fill-mode: both;
+      animation-timeline: --cv; animation-range: contain 0% contain 100%;
+    }
+    .cv-l { animation-name: cvL; } .cv-r { animation-name: cvR; } .cv-mid { animation-name: cvMid; }
+  }
+}
