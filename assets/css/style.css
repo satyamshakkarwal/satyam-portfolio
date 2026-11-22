@@ -1408,6 +1408,19 @@ body.loaded .hero-bloom { animation: heroBloom 2s cubic-bezier(.16,1,.3,1) both;
 .deliver-sec.is-scrub .deliver-pin { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: clamp(1.6rem,4vw,3rem); overflow: hidden; }
 .deliver-sec.is-scrub .deliver-marquee { margin-top: 0; }
 .deliver-sec.is-scrub .dm-row { animation: none !important; }
+.deliver-sec.is-scrub .deliver-pin { box-sizing: border-box; padding: 96px 0 12px; }
+@media (max-height: 860px) {
+  .deliver-sec.is-scrub .deliver-pin { gap: clamp(1rem, 3.2vh, 3rem); }
+  .deliver-sec.is-scrub .deliver-head h2 { font-size: clamp(2.4rem, 9.5vh, 5.4rem); margin: .4rem 0 .6rem; }
+  .deliver-sec.is-scrub .deliver-head p { font-size: 1rem; }
+  .deliver-sec.is-scrub .dm-tilt, .deliver-sec.is-scrub .dm-row { gap: .9rem; }
+  .deliver-sec.is-scrub .dm-card { width: clamp(170px, 32vh, 300px); }
+  .deliver-sec.is-scrub .dm-cap { min-height: 0; padding: 1.1rem 1.2rem; }
+}
+@media (max-height: 640px) {
+  .deliver-sec.is-scrub .deliver-head h2 { font-size: clamp(2.2rem, 8.5vh, 5.4rem); }
+  .deliver-sec.is-scrub .dm-card { width: clamp(160px, 28vh, 300px); }
+}
 .dm-card { width: clamp(210px, 22vw, 300px); flex: none; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-2); background: var(--surface-2); box-shadow: 0 34px 64px -34px rgba(120,70,20,.45); }
 .dm-card img { display: block; width: 100%; height: auto; }
 .dm-cap { position: relative; display: flex; flex-direction: column; justify-content: center; gap: .55rem; padding: 1.6rem 1.6rem 1.5rem; min-height: 178px; background: linear-gradient(165deg, var(--surface-2), color-mix(in srgb, var(--accent) 7%, var(--bg-3))); border: 1px solid var(--border-2); }
@@ -1521,10 +1534,21 @@ a.dm-card .dm-name {
 .dial-dots { display: flex; gap: .5rem; }
 .dial-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-2); transition: all .35s; }
 .dial-dots i.on { background: var(--accent); width: 22px; border-radius: 4px; }
+/* pinned sections centre BELOW the fixed nav (its bottom edge sits at ~96px), and shrink on short laptop screens
+   (a 1366x768 or 125%-scaled 1920x1080 screen leaves only ~640px, and the heading slid under the nav) */
+@media (min-width: 761px) {
+  .dial-pin { box-sizing: border-box; padding-top: 96px; }
+}
+@media (min-width: 761px) and (max-height: 860px) {
+  .dial-head { margin-bottom: .3rem; }
+  .dial-head h2 { font-size: clamp(1.8rem, 6.4vh, 4rem); margin-top: .2rem; }
+  .dial { height: clamp(220px, 40vh, 460px); }
+  .dial-foot { margin-top: .4rem; gap: .7rem; }
+}
 @media (max-width: 760px) {
   .dial-sec { height: 300vh; }
   .dial-pin { align-items: flex-start; }
-  .dial-pin > .wrap { padding-top: 12vh; }
+  .dial-pin > .wrap { padding-top: max(12vh, 104px); }
   .dial-head { margin-bottom: 2rem; }
   .dial-head h2 { font-size: clamp(1.7rem, 7vw, 2.3rem); }
   .dial { height: auto; overflow: visible; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
