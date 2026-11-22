@@ -8,23 +8,25 @@
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ----------  THEME (persist across pages)  ---------- */
-  const THEME_KEY = "satyam-theme";
+  // dark by default for everyone; only a real tap on the toggle is remembered (new key, because the old
+  // one was written on every first visit, so old visitors would be stuck on a light theme they never picked)
+  const THEME_KEY = "satyam-theme-v2";
   const root = document.documentElement;
-  function setTheme(t) {
+  function setTheme(t, save) {
     root.setAttribute("data-theme", t);
-    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+    if (save) { try { localStorage.setItem(THEME_KEY, t); } catch (e) {} }
     $$("[data-theme-toggle]").forEach((el) => { const tip = t === "dark" ? "Light mode" : "Dark mode"; el.setAttribute("title", "Switch to " + tip.toLowerCase()); el.setAttribute("data-tip", tip); });
   }
   (function initTheme() {
     let saved;
     try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
-    if (!saved) saved = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    if (saved !== "light" && saved !== "dark") saved = "dark";
     setTheme(saved);
   })();
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-theme-toggle]");
     if (!t) return;
-    setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark", true);
   });
 
   /* ----------  PRELOADER  ---------- */
@@ -362,7 +364,7 @@
     const platEl = document.getElementById("cf-plat");
     const linkEl = document.getElementById("cf-link");
     const dotsEl = document.getElementById("cf-dots");
-    const ORDER = ["millionaire-fragrances", "fragfreak", "the-funky-fitz", "taneja-cloth-house", "perfy-you", "creative-inktales", "helping-life-foundation", "poweroxx", "trydent"];
+    const ORDER = ["innereaze", "millionaire-fragrances", "fragfreak", "the-funky-fitz", "taneja-cloth-house", "perfy-you", "creative-inktales", "helping-life-foundation", "poweroxx", "trydent"];
     const items = ORDER.map((s) => ({ slug: s, p: PROJECTS[s] })).filter((x) => x.p);
     if (!items.length) return;
 
@@ -1009,6 +1011,19 @@
 
   /* ----------  PROJECT DATA  ---------- */
   const PROJECTS = {
+    "innereaze": { name: "InnerEaze", year: "", platform: "Shopify", mesh: "mesh-b",
+      tagline: "A bright, Gen Z style Shopify store for an innerwear family business that started in 1986.",
+      industry: "Innerwear / eCommerce",
+      overview: ["InnerEaze brings three innerwear brands from one Delhi family business into a single store: Ecomax, Swagat and Swagat Manzito, plus kidswear, sportswear and handkerchiefs. I built the new Shopify store end to end, from the homepage to the product, collection, about, contact and policy pages.",
+        "The brief was clear. A business that has been making innerwear in Tirupur since 1986 should look and feel like a young D2C brand, while keeping its everyday prices and its story."],
+      challenge: ["The old website ran on WordPress and had been hacked, with spam links hidden in its pages, so we started fresh on Shopify instead of repairing it.",
+        "Innerwear sells in value packs at everyday prices. The store had to feel fun and current without looking expensive, and make pack sizes and the price per piece easy to read."],
+      approach: ["I designed a bright pop look that the client picked from a few palettes: electric blue, sunny yellow and coral, sticker style buttons, a moving ticker and a bento hero that shows the whole range at a glance.",
+        "Every part of the store is its own editable Shopify section, so the client can change text, photos and colours without touching code. Product pages show the price per piece, size help and smooth motion, and the collections are organised by brand.",
+        "Shipping, returns and FAQ text use the client's real terms, and every page scores 100 for accessibility and SEO in Google Lighthouse on mobile."],
+      services: ["Shopify", "Custom Liquid", "Design", "SEO"],
+      results: [{n:"3",l:"Brands in one store"},{n:"100",l:"Lighthouse SEO and accessibility"}], live: null, shots: null, next: "millionaire-fragrances" },
+
     "millionaire-fragrances": { name: "Millionaire Fragrances", year: "2026", platform: "Shopify", mesh: "mesh-b",
       tagline: "A luxury perfume store on Shopify with 2,500+ designer, niche and Middle Eastern fragrances.",
       industry: "Luxury Fragrance / eCommerce",
@@ -1163,6 +1178,7 @@
 
   /* ---- live URLs, screenshots, and next-chain ---- */
   const LIVE = {
+    "innereaze": "https://innereaze.in/",
     "millionaire-fragrances": "https://millionairefragrance.com/",
     "fragfreak": "https://fragfreak.in/", "perfy-you": "https://perfyou.in/",
     "creative-inktales": "https://www.creativeinktales.com", "helping-life-foundation": "https://helpinglifefoundation.org",
@@ -1174,7 +1190,7 @@
     "trydent": "https://www.trydent.in",
     "taneja-cloth-house": "https://tanejaclothhouse.com/"
   };
-  const ORDER = ["millionaire-fragrances","fragfreak","the-funky-fitz","taneja-cloth-house","perfy-you","creative-inktales","helping-life-foundation","poweroxx","kurta-pyjama-ca","sundar-prem","owners-pride-healthcare","blackout-lifting-club","trydent"];
+  const ORDER = ["innereaze","millionaire-fragrances","fragfreak","the-funky-fitz","taneja-cloth-house","perfy-you","creative-inktales","helping-life-foundation","poweroxx","kurta-pyjama-ca","sundar-prem","owners-pride-healthcare","blackout-lifting-club","trydent"];
   const NO_PM = new Set(["helping-life-foundation", "kurta-pyjama-ca", "sundar-prem"]);
   ORDER.forEach((slug, i) => {
     const p = PROJECTS[slug];
@@ -1196,7 +1212,7 @@
     PROJECTS["helping-life-foundation"].shots = [hb + "-1.jpg", hb + "-2.png", hb + "-3.png", hb + "-m.jpg", hb + "-m.jpg"];
   }
   // re-captured clean detail screenshots (homepage + real collection + product + mobile) as optimized .jpg
-  const JPG_SHOTS = ["millionaire-fragrances", "fragfreak", "perfy-you", "creative-inktales", "poweroxx", "the-funky-fitz", "trydent", "owners-pride-healthcare", "blackout-lifting-club", "sundar-prem"];
+  const JPG_SHOTS = ["innereaze", "millionaire-fragrances", "fragfreak", "perfy-you", "creative-inktales", "poweroxx", "the-funky-fitz", "trydent", "owners-pride-healthcare", "blackout-lifting-club", "sundar-prem"];
   JPG_SHOTS.forEach((slug) => {
     if (!PROJECTS[slug]) return;
     const b = "assets/img/projects/" + slug;
@@ -1209,6 +1225,7 @@
 
   /* ---- per-card bento meta (industry + size), projects grid only ---- */
   const PMETA = {
+    "innereaze": { ind: "fashion ecommerce", size: "feat" },
     "millionaire-fragrances": { ind: "beauty ecommerce", size: "feat" },
     "fragfreak": { ind: "beauty ecommerce", size: "feat" },
     "perfy-you": { ind: "fashion ecommerce" },
@@ -1224,7 +1241,7 @@
     "taneja-cloth-house": { ind: "fashion ecommerce" }
   };
   // latest work: gets a "New" badge on every card and in the coverflow
-  const NEW_WORK = new Set(["millionaire-fragrances", "fragfreak", "the-funky-fitz"]);
+  const NEW_WORK = new Set(["innereaze", "millionaire-fragrances", "fragfreak", "the-funky-fitz"]);
   const newBadge = () => { const b = document.createElement("span"); b.className = "proj-new"; b.textContent = "New"; return b; };
 
   /* ---- inject live screenshots + frame + view-cta into project cards ---- */
@@ -1341,7 +1358,7 @@
     const nx = PROJECTS[p.next];
     let prevSlug = null; for (const k in PROJECTS) { if (PROJECTS[k].next === slug) { prevSlug = k; break; } }
     const pv = prevSlug ? PROJECTS[prevSlug] : null;
-    const GLOW = { "millionaire-fragrances": "rgba(184,138,24,.4)", "fragfreak": "rgba(64,104,170,.4)", "perfy-you": "rgba(150,92,196,.4)", "creative-inktales": "rgba(198,84,62,.42)", "helping-life-foundation": "rgba(74,166,108,.4)", "poweroxx": "rgba(96,88,206,.4)", "the-funky-fitz": "rgba(214,128,52,.42)", "trydent": "rgba(150,132,84,.44)", "kurta-pyjama-ca": "rgba(150,110,80,.42)", "sundar-prem": "rgba(190,100,132,.4)", "owners-pride-healthcare": "rgba(80,162,150,.4)", "blackout-lifting-club": "rgba(126,116,128,.42)" };
+    const GLOW = { "innereaze": "rgba(36,80,255,.4)", "millionaire-fragrances": "rgba(184,138,24,.4)", "fragfreak": "rgba(64,104,170,.4)", "perfy-you": "rgba(150,92,196,.4)", "creative-inktales": "rgba(198,84,62,.42)", "helping-life-foundation": "rgba(74,166,108,.4)", "poweroxx": "rgba(96,88,206,.4)", "the-funky-fitz": "rgba(214,128,52,.42)", "trydent": "rgba(150,132,84,.44)", "kurta-pyjama-ca": "rgba(150,110,80,.42)", "sundar-prem": "rgba(190,100,132,.4)", "owners-pride-healthcare": "rgba(80,162,150,.4)", "blackout-lifting-club": "rgba(126,116,128,.42)" };
     const glow = GLOW[slug] || "var(--glow)";
     const platTag = p.platform === "Shopify" ? "shopify" : "framer";
     const tags = p.services.map((s) => {
@@ -1349,7 +1366,7 @@
       return `<span class="${cls}">${s}</span>`;
     }).join("");
     let host = ""; try { host = p.live ? new URL(p.live).host.replace(/^www\./, "") : ""; } catch (e) {}
-    const FULL = { "millionaire-fragrances": "millionaire-fragrances-full.jpg", "fragfreak": "fragfreak-full.jpg", "perfy-you": "perfy-you-full.jpg", "trydent": "trydent-full.jpg" };
+    const FULL = { "innereaze": "innereaze-full.jpg", "millionaire-fragrances": "millionaire-fragrances-full.jpg", "fragfreak": "fragfreak-full.jpg", "perfy-you": "perfy-you-full.jpg", "trydent": "trydent-full.jpg" };
     const isLive = !!FULL[slug];
     const heroInner = isLive
       ? `<img class="pd-live" src="assets/img/projects/${FULL[slug]}" alt="${p.name} website" loading="eager" decoding="async">`

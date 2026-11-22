@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,8 +23,8 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" /></noscript>
 <style>@view-transition{navigation:auto}</style>
-<script>(function(){try{var d=document.documentElement,t=localStorage.getItem("satyam-theme");if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";d.setAttribute("data-theme",t);if(sessionStorage.getItem("satyam-pre")){d.classList.add("pre-seen");if("onpagereveal" in window)addEventListener("pagereveal",function(e){if(!e.viewTransition)d.classList.add("page-in")});else d.classList.add("page-in")}}catch(e){}})();</script>
-<link rel="stylesheet" href="assets/css/style.css?v=51" />
+<script>(function(){try{var d=document.documentElement,t=localStorage.getItem("satyam-theme-v2");if(t!=="light")t="dark";d.setAttribute("data-theme",t);if(sessionStorage.getItem("satyam-pre")){d.classList.add("pre-seen");if("onpagereveal" in window)addEventListener("pagereveal",function(e){if(!e.viewTransition)d.classList.add("page-in")});else d.classList.add("page-in")}}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/style.css?v=52" />
 </head>
 <body class="no-scroll">
 
@@ -90,14 +90,14 @@
     <span class="liq liq1"></span><span class="liq liq2"></span><span class="liq liq3"></span><span class="liq liq4"></span>
   </div>
   <div class="hero-spot" aria-hidden="true"></div>
-  <div class="hero-sweep" aria-hidden="true"></div>
+  <div class="hero-bloom" aria-hidden="true"></div>
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <div class="avail" data-animate="fade-up"><span class="live"></span> Available for new projects</div>
       <h1>
-        <span class="line"><span data-animate="fade-up">I build premium</span></span>
-        <span class="line"><span class="grad" data-animate="fade-up" data-delay="1">Shopify &amp; Framer</span></span>
-        <span class="line"><span data-animate="fade-up" data-delay="2">websites that <span class="rot"><b>convert.</b><b>sell.</b><b>scale.</b><b>rank.</b></span></span></span>
+        <span class="line"><span data-animate="fade-up"><span class="w"><span style="--d:.08s">I</span></span> <span class="w"><span style="--d:.15s">build</span></span> <span class="w"><span style="--d:.22s">premium</span></span></span></span>
+        <span class="line"><span class="grad" data-animate="fade-up">Shopify &amp; Framer</span></span>
+        <span class="line"><span data-animate="fade-up"><span class="w"><span style="--d:.44s">websites</span></span> <span class="w"><span style="--d:.51s">that</span></span> <span class="w"><span style="--d:.58s"><span class="rot"><b>convert.</b><b>sell.</b><b>scale.</b><b>rank.</b></span></span></span></span></span>
       </h1>
       <p class="hero-sub" data-animate="fade-up" data-delay="3">
         Clean design, performance, and conversion-driven builds for eCommerce and service brands.
@@ -139,6 +139,7 @@
   </div>
   <div class="logos-marquee" aria-hidden="true">
     <div class="ticker-track logos-track">
+      <span class="logo-cell"><img class="lw" data-src="assets/img/logos/innereaze.png" alt="InnerEaze"></span>
       <span class="logo-cell"><img class="lw" data-src="assets/img/logos/taneja-cloth-house.png" alt="Taneja Cloth House"></span>
       <span class="logo-cell"><img class="lw inv" data-src="assets/img/logos/fragfreak.png" alt="FragFreak"></span>
       <span class="logo-cell"><img class="lw inv" data-src="assets/img/logos/perfy-you.png" alt="Perfy You"></span>
@@ -211,6 +212,14 @@
     </div>
 
     <div class="proj-grid">
+      <a href="project.html?p=innereaze" class="proj-card card3d" data-card3d>
+        <div class="proj-visual"><div class="mesh mesh-b"></div><span class="logo">InnerEaze</span></div>
+        <div class="proj-body">
+          <div class="top"><h3>InnerEaze</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
+          <p>A bright, Gen Z style Shopify store for an innerwear family business from 1986, with three brands under one roof.</p>
+          <div class="proj-meta"><span class="tag shopify">Shopify</span><span class="tag">Innerwear</span><span class="tag">Store Build</span></div>
+        </div>
+      </a>
       <a href="project.html?p=millionaire-fragrances" class="proj-card card3d" data-card3d>
         <div class="proj-visual"><div class="mesh mesh-b"></div><span class="yr">2026</span><span class="logo">Millionaire<br>Fragrances</span></div>
         <div class="proj-body">
@@ -271,15 +280,6 @@
           <div class="top"><h3>Helping Life Foundation</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
           <p>A trustworthy non-profit site that makes the mission clear and donations effortless.</p>
           <div class="proj-meta"><span class="tag framer">Framer</span><span class="tag">Non-profit</span><span class="tag">Trust</span></div>
-        </div>
-      </a>
-
-      <a href="project.html?p=trydent" class="proj-card card3d" data-card3d>
-        <div class="proj-visual"><div class="mesh mesh-f"></div><span class="yr">2022</span><span class="logo">Trydent</span></div>
-        <div class="proj-body">
-          <div class="top"><h3>Trydent</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
-          <p>A modern D2C store with a clean storefront and a setup ready to scale with paid ads.</p>
-          <div class="proj-meta"><span class="tag shopify">Shopify</span><span class="tag">D2C</span><span class="tag">Fashion</span></div>
         </div>
       </a>
     </div>
@@ -526,6 +526,6 @@
 <button class="to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:20px;height:20px"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script src="assets/js/lenis.min.js?v=46"></script>
-<script src="assets/js/main.js?v=52"></script>
+<script src="assets/js/main.js?v=54"></script>
 </body>
 </html>

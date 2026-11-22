@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,8 +23,8 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" /></noscript>
 <style>@view-transition{navigation:auto}</style>
-<script>(function(){try{var d=document.documentElement,t=localStorage.getItem("satyam-theme");if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";d.setAttribute("data-theme",t);if(sessionStorage.getItem("satyam-pre")){d.classList.add("pre-seen");if("onpagereveal" in window)addEventListener("pagereveal",function(e){if(!e.viewTransition)d.classList.add("page-in")});else d.classList.add("page-in")}}catch(e){}})();</script>
-<link rel="stylesheet" href="assets/css/style.css?v=51" />
+<script>(function(){try{var d=document.documentElement,t=localStorage.getItem("satyam-theme-v2");if(t!=="light")t="dark";d.setAttribute("data-theme",t);if(sessionStorage.getItem("satyam-pre")){d.classList.add("pre-seen");if("onpagereveal" in window)addEventListener("pagereveal",function(e){if(!e.viewTransition)d.classList.add("page-in")});else d.classList.add("page-in")}}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/style.css?v=52" />
 </head>
 <body class="no-scroll">
 
@@ -137,6 +137,15 @@
     </div>
 
     <div class="proj-grid bento">
+      <!-- NEW: InnerEaze -->
+      <a href="project.html?p=innereaze" class="proj-card" data-cat="featured" data-animate="fade-up">
+        <div class="proj-visual"><div class="mesh mesh-b"></div><span class="logo">InnerEaze</span></div>
+        <div class="proj-body">
+          <div class="top"><h3>InnerEaze</h3><span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M7 17L17 7M9 7h8v8"/></svg></span></div>
+          <p>A bright, Gen Z style Shopify store for an innerwear family business from 1986, with three brands under one roof.</p>
+          <div class="proj-meta"><span class="tag shopify">Shopify</span><span class="tag">Innerwear</span><span class="tag">Store Build</span></div>
+        </div>
+      </a>
       <!-- NEW: Millionaire Fragrances -->
       <a href="project.html?p=millionaire-fragrances" class="proj-card" data-cat="featured" data-animate="fade-up">
         <div class="proj-visual"><div class="mesh mesh-b"></div><span class="yr">2026</span><span class="logo">Millionaire<br>Fragrances</span></div>
@@ -291,6 +300,6 @@
 <button class="to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:20px;height:20px"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script src="assets/js/lenis.min.js?v=46"></script>
-<script src="assets/js/main.js?v=52"></script>
+<script src="assets/js/main.js?v=54"></script>
 </body>
 </html>

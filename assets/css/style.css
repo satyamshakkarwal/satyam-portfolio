@@ -645,9 +645,19 @@ html.is-leaving .page-bar { opacity: 1; animation: pageBar 2.4s cubic-bezier(.08
 .hero .wrap { position: relative; z-index: 2; }
 .hero-grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
 .hero-copy { display: flex; flex-direction: column; gap: 1.5rem; min-width: 0; }
-/* dramatic slide-in-from-left for the copy (fires after preloader via .in) */
-.hero-copy > [data-animate="fade-up"] { transform: translateX(-85px); filter: blur(6px); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1), filter .7s ease; }
-.hero-copy > [data-animate="fade-up"].in { transform: none; filter: blur(0); }
+/* hero entrance (fires after the preloader via .in): the copy rises straight up into place in reading
+   order; the headline words rise out of their own masks (see .hero h1 .w); a warm bloom opens behind */
+.hero-copy > [data-animate="fade-up"] { transform: translateY(22px); filter: none; transition: opacity .9s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1); }
+.hero-copy > [data-animate="fade-up"].in { transform: none; }
+.hero-copy > .avail[data-animate] { filter: blur(8px); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .7s ease; transition-delay: 0s; }
+.hero-copy > .avail[data-animate].in { filter: blur(0); }
+.hero-copy > .hero-sub[data-animate] { transition-delay: .62s; }
+.hero-copy > .hero-cta[data-animate] { transition-delay: .74s; }
+/* chips arrive one by one (translate/opacity only, so the chip hover lift still works) */
+.hero-copy > .hero-tags[data-animate] { opacity: 1; transform: none; transition: none; }
+.hero-tags .chip { opacity: 0; translate: 0 14px; transition: transform .25s, border-color .25s, color .25s, opacity .6s ease var(--cd, .86s), translate .8s cubic-bezier(.16,1,.3,1) var(--cd, .86s); }
+.hero-tags.in .chip { opacity: 1; translate: none; }
+.hero-tags .chip:nth-child(2) { --cd: .91s; } .hero-tags .chip:nth-child(3) { --cd: .96s; } .hero-tags .chip:nth-child(4) { --cd: 1.01s; } .hero-tags .chip:nth-child(5) { --cd: 1.06s; }
 /* 3D floating work-showcase */
 .hero-show { position: relative; perspective: 1300px; min-height: clamp(330px, 36vw, 470px); }
 .hs-stage { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; transition: transform .25s ease-out; }
@@ -694,14 +704,13 @@ body.loaded .hs-badge { animation: hsBadge .75s cubic-bezier(.2,1.6,.35,1) 1.35s
 .hero-show:hover .hs-front { animation-play-state: paused; transform: translateZ(45px) translate(-11%, 7%) rotate(-5deg) scale(1.03) !important; box-shadow: 0 62px 120px -38px rgba(120,70,20,.6); }
 .hero-show:hover .hs-back  { animation-play-state: paused; transform: translateZ(-12px) translate(14%, -10%) rotate(7deg) scale(1.02) !important; opacity: 1 !important; }
 .hero-show:hover .hs-screen img { animation-play-state: paused; }
-/* one-time light sweep across the hero on load */
-.hero-sweep { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: linear-gradient(105deg, transparent 42%, rgba(255,255,255,.55) 50%, transparent 58%); transform: translateX(-120%); }
-body.loaded .hero-sweep { animation: heroSweep2 1.15s ease-out .55s both; }
-@keyframes heroSweep2 { 0% { opacity: 0; transform: translateX(-120%); } 22% { opacity: 1; } 100% { opacity: 0; transform: translateX(120%); } }
-/* kinetic headline: stronger sequential line cascade */
-.hero h1 .line:nth-child(1) > span[data-animate] { transition-delay: .05s; }
-.hero h1 .line:nth-child(2) > span[data-animate] { transition-delay: .2s; }
-.hero h1 .line:nth-child(3) > span[data-animate] { transition-delay: .35s; }
+/* one-time warm bloom: light opens outward from behind the headline, then settles away (no direction) */
+.hero-bloom { position: absolute; z-index: 1; left: 27%; top: 47%; width: min(1150px, 92vw); aspect-ratio: 1; margin: calc(min(1150px, 92vw) / -2) 0 0 calc(min(1150px, 92vw) / -2); border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(closest-side, rgba(255,242,224,.95), rgba(255,228,196,.55) 38%, rgba(255,214,172,.2) 64%, transparent 100%); }
+body.loaded .hero-bloom { animation: heroBloom 2s cubic-bezier(.16,1,.3,1) both; }
+@keyframes heroBloom { 0% { opacity: 0; transform: scale(.22); } 28% { opacity: .95; } 100% { opacity: 0; transform: scale(1.18); } }
+[data-theme="dark"] .hero-bloom { background: radial-gradient(closest-side, rgba(255,150,70,.5), rgba(214,92,34,.22) 45%, transparent 100%); }
+@media (max-width: 980px) { .hero-bloom { left: 50%; top: 30%; width: 170vw; margin: -85vw 0 0 -85vw; } }
+@media (prefers-reduced-motion: reduce) { .hero-bloom { display: none; } .hero-tags .chip { opacity: 1 !important; translate: none !important; } .hero h1 .w > span, .hero h1 .grad[data-animate] { transform: none !important; } }
 @media (prefers-reduced-motion: reduce) { .hs-front, .hs-back, .hs-badge { opacity: 1 !important; animation: none !important; } .hs-back { opacity: .92 !important; } }
 @media (max-width: 980px) {
   .hero-grid { grid-template-columns: 1fr; }
@@ -751,17 +760,15 @@ body.loaded .hero-sweep { animation: heroSweep2 1.15s ease-out .55s both; }
   animation: heroShimmer 6s ease-in-out infinite;
 }
 @keyframes heroShimmer { 0%,100% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
-/* kinetic headline: lines swing up from behind the mask with overshoot */
+/* kinetic headline: every word rises out of its own mask, one after another (delays inline as --d);
+   the gradient line rises as one piece so its colour stays continuous */
 .hero h1 { position: relative; }
-.hero h1 .line > span[data-animate="fade-up"] { transform: translateY(118%) rotate(2.5deg); transform-origin: left bottom; transition: transform 1.1s cubic-bezier(.19,1,.22,1), opacity .5s ease; }
-.hero h1 .line > span[data-animate="fade-up"].in { transform: none; }
-/* one-time light sweep across the headline */
-.hero h1::after {
-  content: ""; position: absolute; inset: -6% -4%; pointer-events: none; z-index: 3; border-radius: 12px;
-  background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.5) 50%, transparent 62%);
-  transform: translateX(-120%); animation: heroSweep 1.5s 1.15s cubic-bezier(.4,0,.2,1) 1 both; mix-blend-mode: overlay;
-}
-@keyframes heroSweep { 0% { transform: translateX(-120%); opacity: 1; } 75% { opacity: 1; } 100% { transform: translateX(120%); opacity: 0; } }
+.hero h1 .line > span[data-animate="fade-up"] { opacity: 1; transform: none; filter: none; transition: none; }
+.hero h1 .w { display: inline-block; overflow: hidden; vertical-align: top; padding: 0 .06em .12em; margin: 0 -.06em -.12em; }
+.hero h1 .w > span { display: inline-block; transform: translateY(108%); transition: transform 1.05s cubic-bezier(.16,1,.3,1) var(--d, 0s); }
+.hero h1 .in .w > span { transform: none; }
+.hero h1 .line > span.grad[data-animate] { transform: translateY(108%); transition: transform 1.05s cubic-bezier(.16,1,.3,1) .3s; }
+.hero h1 .line > span.grad[data-animate].in { transform: none; }
 /* floating 3D glass tech chips */
 .hero-floats { position: absolute; inset: 0; z-index: 1; pointer-events: none; perspective: 1000px; will-change: transform; }
 .hfloat {
